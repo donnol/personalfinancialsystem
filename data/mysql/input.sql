@@ -42,4 +42,12 @@ CREATE TABLE IF NOT EXISTS t_category(
 	modifyTime DATETIME NOT NULL
 )default charset=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS ci_sessions(
+	session_id VARCHAR(128) PRIMARY KEY NOT NULL, 
+	ip_address VARCHAR(128) NOT NULL,
+	user_agent VARCHAR(128) NOT NULL,
+	last_activity INT(64) NOT NULL,
+	user_data TEXT DEFAULT '' NOT NULL
+)default charset=utf8mb4;
+
 INSERT INTO t_user set userId=10001, password=sha1('123'), name='jd', type='管理员', createTime=NOW(), modifyTime=NOW();
