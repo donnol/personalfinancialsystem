@@ -50,4 +50,4 @@ CREATE TABLE IF NOT EXISTS ci_sessions(
 	user_data TEXT DEFAULT '' NOT NULL
 )default charset=utf8mb4;
 
-INSERT INTO t_user set userId=10001, password=sha1('123'), name='jd', type='管理员', createTime=NOW(), modifyTime=NOW();
+INSERT INTO t_user set userId=10001, password=sha1('123'), name='jd', type='0', createTime=NOW(), modifyTime=NOW();

@@ -55,23 +55,22 @@
 				'createTime'=>$createTime,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->insert('t_category');
+			$this->db->insert('t_category', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
 			);
 		}
-		public function mod($name, $remark, $modifyTime)
+		public function mod($userId, $name, $remark, $modifyTime)
 		{
 			$data = array(
 				'name'=>$name,
 				'remark'=>$remark,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->update('t_category');
+			$this->db->where('userId', $userId);
+			$this->db->update('t_category', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',

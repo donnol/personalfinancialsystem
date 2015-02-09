@@ -59,15 +59,14 @@
 				'createTime'=>$createTime,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->insert('t_account');
+			$this->db->insert('t_account',$data);
 			return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
 			);
 		}
-		public function mod($name, $money, $type, $categoryId, $typeId, $remark, $modifyTime)
+		public function mod($userId, $name, $money, $type, $categoryId, $typeId, $remark, $modifyTime)
 		{
 			$data = array(
 				'name'=>$name,
@@ -78,8 +77,8 @@
 				'remark'=>$remark,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->update('t_account');
+			$this->db->where('userId', $userId);
+			$this->db->update('t_account', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',

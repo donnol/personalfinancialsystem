@@ -26,11 +26,11 @@
 				'data'=>$data
 			);
 		}
-		public function get_user_by_name_and_pwd($name, $passowrd)
+		public function get_user_by_name_and_pwd($name, $password)
 		{
 			$data = array(
 				'name'=>$name,
-				'$password'=>$password,
+				'password'=>$password
 			);	
 			$this->db->where($data);
 			$query = $this->db->get('t_user');
@@ -55,13 +55,9 @@
 				'data'=>$data
 			);
 		}
-		public function get_user_by_name_and_type($name, $type)
+		public function get_user_by_type($type)
 		{
-			$data = array(
-				'name'=>$name,
-				'type'=>$type
-			);
-			$this->db->where($data);
+			$this->db->where('type', $type);
 			$query = $this->db->get('t_user');
 			$data = $query->result_array();
 			return array(
@@ -70,9 +66,13 @@
 				'data'=>$data
 			);
 		}
-		public function get_pwd_by_id($userId)
+		public function get_user_by_name_and_type($name, $type)
 		{
-			$this->db->where('userId', $userId);
+			$data = array(
+				'name'=>$name,
+				'type'=>$type
+			);
+			$this->db->where($data);
 			$query = $this->db->get('t_user');
 			$data = $query->result_array();
 			return array(
@@ -100,15 +100,14 @@
 				'createTime'=>$createTime,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->insert('t_user');
+			$this->db->insert('t_user', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
 			);
 		}
-		public function mod($name, $password, $type, $modifyTime)
+		public function mod($userId, $name, $password, $type, $modifyTime)
 		{
 			$data = array(
 				'name'=>$name,
@@ -116,36 +115,36 @@
 				'type'=>$type,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->update('t_user');
+			$this->db->where('userId', $userId);
+			$this->db->update('t_user', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
 			);
 		}
-		public function mod_user_type($userId, $type)
+		public function mod_user_type($userId, $type, $modifyTime)
 		{
 			$data = array(
-				'userId'=>$userId,
-				'type'=>$type
+				'type'=>$type,
+				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->update('t_user');
+			$this->db->where('userId', $userId);
+			$this->db->update('t_user', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
 			);
 		}
-		public function mod_user_pwd($userId, $pwd)
+		public function mod_user_pwd($name, $pwd, $modifyTime)
 		{
 			$data = array(
-				'userId'=>$userId,
-				'password'=>$pwd
+				'password'=>$pwd,
+				'modifyTime'=>$modifyTime
 			);
-			$this->db->where($data);
-			$this->db->update('t_user');
+			$this->db->where('name', $name);
+			$this->db->update('t_user', $data);
 			return array(
 				'code'=>0,
 				'msg'=>'',
