@@ -9,7 +9,6 @@ class Category_service extends CI_Model{
 	{
 		$data = $this->category_model->get_all_category();
 		$num = count($data['data']);
-		var_dump($num);
 		if( $num == 0 )
 			return array(
 				'code'=>1, 
@@ -120,6 +119,15 @@ class Category_service extends CI_Model{
 			'data'=>$result
 		);
 
+	}
+	public function get_category_by_id($categoryId)
+	{
+		$data = $this->category_model->get_category_by_id($categoryId);
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data['data']
+		);
 	}
 	public function del($categoryId)
 	{

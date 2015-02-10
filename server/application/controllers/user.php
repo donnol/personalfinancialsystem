@@ -82,7 +82,7 @@ class User extends CI_Controller{
 		$name = $this->input->post('name');
 		$password = sha1($this->input->post('password'));
 		$type = $this->input->post('type');
-		$createTime = date('Y-m-d H:m:s',time());
+		$createTime = date('Y-m-d H:m:s');
 		$modifyTime = $createTime;
 
 		$data['json'] = $this->user_service->add($name, $password, $type, $createTime, $modifyTime);

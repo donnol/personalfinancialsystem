@@ -10,11 +10,11 @@ class Category extends CI_Controller{
 	{
 		$result = $this->login_service->islogin();
 		if( $result['code'] != 0 )
-			return array(
-				'code'=>1,
-				'msg'=>'havent login',
-				'data'=>''
-			);
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
 		$pageIndex = $this->input->get('pageIndex');
@@ -34,13 +34,12 @@ class Category extends CI_Controller{
 	{
 		$result = $this->login_service->islogin();
 		if( $result['code'] != 0 )
-			return array(
-				'code'=>1,
-				'msg'=>'havent login',
-				'data'=>''
-			);
-
-		$categoryId = $this->input->post('categoryId');
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
+		$categoryId = $this->input->get('categoryId');
 
 		$data['json'] = $this->category_service->get_category_by_id($categoryId);
 		$this->load->view('json', $data);
@@ -49,12 +48,11 @@ class Category extends CI_Controller{
 	{
 		$result = $this->login_service->islogin();
 		if( $result['code'] != 0 )
-			return array(
-				'code'=>1,
-				'msg'=>'havent login',
-				'data'=>''
-			);
-
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
 		$categoryId = $this->input->post('categoryId');
 
 		$data['json'] = $this->category_service->del($categoryId);
@@ -64,15 +62,15 @@ class Category extends CI_Controller{
 	{
 		$result = $this->login_service->islogin();
 		if( $result['code'] != 0 )
-			return array(
-				'code'=>1,
-				'msg'=>'havent login',
-				'data'=>''
-			);
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}	
 
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
-		$createTime = date('Y-m-d H:m:s', time());
+		$createTime = date('Y-m-d H:m:s');
 		$modifyTime = $createTime;
 
 		$data['json'] = $this->category_service->add($name, $remark, $createTime, $modifyTime);
