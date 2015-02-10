@@ -99,7 +99,7 @@ class User extends CI_Controller{
 		}
 		$userId = $this->input->post('userId');
 		$type = $this->input->post('type');
-		$modifyTime = date('Y-m-d H:m:s', time());
+		$modifyTime = date('Y-m-d H:m:s');
 
 		$data['json'] = $this->user_service->mod_user_type($userId, $type, $modifyTime);
 		$this->load->view('json', $data);
@@ -115,7 +115,7 @@ class User extends CI_Controller{
 		}
 		$userId = $this->input->post('userId');
 		$password = sha1($this->input->post('password'));
-		$modifyTime = date('Y-m-d H:m:s', time());
+		$modifyTime = date('Y-m-d H:m:s');
 
 		$data['json'] = $this->user_service->mod_user_pwd($userId, $password, $modifyTime);
 		$this->load->view('json', $data);
@@ -131,7 +131,7 @@ class User extends CI_Controller{
 		}
 		$old = sha1($this->input->post('oldPassword'));
 		$new = sha1($this->input->post('newPassword'));
-		$modifyTime = date('Y-m-d H:m:s', time());
+		$modifyTime = date('Y-m-d H:m:s');
 
 		$data['json'] = $this->user_service->mod_old_pwd($old, $new, $modifyTime);
 		$this->load->view('json', $data);

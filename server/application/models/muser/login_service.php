@@ -17,11 +17,18 @@ class Login_service extends CI_Model{
 			$value = sha1(rand());
 			$t = time();
 			$ip = $this->input->ip_address();
+			$user_agent = '';
+			$result = $this->cookie_model->get_cookie_by_id($value);
+			if( count($result['data']) != 0 )
+				$value = sha1(rand());
 			setcookie('user', $value, $t+3600, '/', null);
 			if($this->agent->is_browser())
 				$user_agent = $this->agent->browser().'/'.$this->agent->version();
+			
 			$this->cookie_model->add_cookie($value, $ip, $user_agent, $t, '');
+
 			//		$this->session->set_userdata('user_name', $name);
+
 			return array(
 					'code'=>0,
 					'msg'=>'login successfully.',
@@ -43,6 +50,7 @@ class Login_service extends CI_Model{
 		{
 			$val = $_COOKIE['user'];
 			setcookie('user',$val, time()-3600, '/', null);
+			$this->cookie_model->del_cookie($val);
 			return array(
 					'code'=>0,
 					'msg'=>'',
@@ -50,10 +58,10 @@ class Login_service extends CI_Model{
 				    );
 		}
 		return array(
-			'code'=>1,
-			'msg'=>'checkout error.',
-			'data'=>''
-		);
+				'code'=>1,
+				'msg'=>'checkout error.',
+				'data'=>''
+			    );
 	}	
 	public function islogin()
 	{

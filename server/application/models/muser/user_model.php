@@ -26,6 +26,17 @@
 				'data'=>$data
 			);
 		}
+		public function get_user_by_pwd($pwd)
+		{
+			$this->db->where('password', $pwd);
+			$query = $this->db->get('t_user');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
 		public function get_user_by_name_and_pwd($name, $password)
 		{
 			$data = array(
@@ -134,13 +145,13 @@
 				'data'=>''
 			);
 		}
-		public function mod_user_pwd($name, $pwd, $modifyTime)
+		public function mod_user_pwd($userId, $pwd, $modifyTime)
 		{
 			$data = array(
 				'password'=>$pwd,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where('name', $name);
+			$this->db->where('userId', $userId);
 			$this->db->update('t_user', $data);
 			return array(
 				'code'=>0,

@@ -223,12 +223,12 @@ class User_service extends CI_Model{
 	}
 	public function mod_old_pwd($old, $new, $modifyTime)
 	{
-		$name = $this->session->userdata('user_name');
-		$data = $this->user_model->get_user_by_name($name);
+		$data = $this->user_model->get_user_by_pwd($old);
 		$tmp = $data['data'];
-		if( $tmp[0]['password'] == $old )
+		$userId = $tmp[0]['userId'];
+		if( count($data['data']) != 0 )
 		{
-			$data = $this->user_model->mod_user_pwd($name, $new, $modifyTime);
+			$data = $this->user_model->mod_user_pwd($userId, $new, $modifyTime);
 			return $data;
 		}
 		return array(
