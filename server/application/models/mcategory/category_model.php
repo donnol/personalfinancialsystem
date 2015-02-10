@@ -26,9 +26,13 @@
 				'data'=>$data
 			);
 		}
-		public function get_category_by_name($name)
+		public function get_category_by_name_or_remark($name, $remark)
 		{
-			$this->db->where('name', $name);
+			$data = array(
+				'name'=>$name,
+				'remark'=>$remark
+			);
+			$this->db->like_or($data);
 			$query = $this->db->get('t_category');
 			$data = $query->result_array();
 			return array(
@@ -40,7 +44,7 @@
 		public function del($categoryId)
 		{
 			$this->db->where('categoryId', $categoryId);
-			$this-db->delete('t_category');
+			$this->db->delete('t_category');
 			return array(
 				'code'=>0,
 				'msg'=>'',

@@ -28,7 +28,51 @@
 		}
 		public function get_account_by_name($name)
 		{
-			$this->db->where('name', $name);
+			$this->db->like('name', $name);
+			$query = $this->db->get('t_account');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_account_by_remark($remark)
+		{
+			$this->db->like('remakr', $remark);
+			$query = $this->db->get('t_account');
+			$data  = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_account_by_name_and_remark($name, $remark)
+		{
+			$data = array(
+				'name'=>$name,
+				'remark'=>$remark
+			);
+			$this->db->like($data);
+			$query = $this->db->get('t_account');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_account_by_or($name, $remark, $type, $categoryId, $cardId)
+		{
+			$data = array(
+				'name'=>$name, 
+				'remark'=>$remark,
+				'type'=>$type,
+				'categoryId'=>$categoryId,
+				'cardId'=>$cardId
+			);
+			$this->db->like_or($data);
 			$query = $this->db->get('t_account');
 			$data = $query->result_array();
 			return array(
