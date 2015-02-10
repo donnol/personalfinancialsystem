@@ -4,7 +4,7 @@ class Login_service extends CI_Model{
 	{
 		parent::__construct();
 		$this->load->model('muser/user_model', 'user_model');
-	//	$this->load->library('session');
+		//	$this->load->library('session');
 		$this->load->model('mcookie/cookie_model', 'cookie_model');
 	}
 	public function checkin($name, $pwd)
@@ -17,7 +17,7 @@ class Login_service extends CI_Model{
 			$t = time();
 			setcookie('user', $value, $t+3600);
 			$this->cookie_model->add_cookie($value,'', '', $t, '');
-	//		$this->session->set_userdata('user_name', $name);
+			//		$this->session->set_userdata('user_name', $name);
 			return array(
 					'code'=>0,
 					'msg'=>'login successfully.',
@@ -34,8 +34,8 @@ class Login_service extends CI_Model{
 	{
 		//setcookie('user', '', time()-3600);
 		$this->cookie_model->del_cookie($_COOKIE['user']);
-	//	$this->session->unset_userdata('user_name');
-	//	$this->session->sess_destroy();
+		//	$this->session->unset_userdata('user_name');
+		//	$this->session->sess_destroy();
 		return array(
 				'code'=>0,
 				'msg'=>'',
@@ -44,21 +44,24 @@ class Login_service extends CI_Model{
 	}
 	public function islogin()
 	{
-		$data = $this->cookie_model->get_cookie_by_id($_COOKIE["user"]);
-		$tmp = $data['data'];
-		if( count($tmp) != 0 )
-	//	if( $name = $this->session->userdata('user_name') )
-		{
-			return array(
+		if(isset($_COOKIE['user']))
+				{
+				$data = $this->cookie_model->get_cookie_by_id($_COOKIE["user"]);
+				$tmp = $data['data'];
+				if( count($tmp) != 0 )
+				//	if( $name = $this->session->userdata('user_name') )
+				{
+				return array(
 					'code'=>0,
 					'msg'=>'login',
 					'data'=>''
-				    );
-		}
-		return array(
-				'code'=>1,
-				'msg'=>'please login',
-				'data'=>''
-			    );
-	}
-}
+					);
+				}
+				}
+				return array(
+					'code'=>1,
+					'msg'=>'please login',
+					'data'=>''
+					);
+				}
+				}

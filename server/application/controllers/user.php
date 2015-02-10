@@ -13,13 +13,13 @@
 			$pageSize = $this->input->get('pageSize');
 			if($name != '' && $type != '')
 			{
-				$data['json'] = $this->user_service->get_user_by_name_and_type($name, $type);
+				$data['json'] = $this->user_service->get_user_by_name_and_type($name, $type, $pageIndex, $pageSize);
 				$this->load->view('json', $data);
 				return;
 			}
 			if($name != '')
 			{
-				$data['json'] = $this->user_service->get_user_by_name($name);
+				$data['json'] = $this->user_service->get_user_by_name($name, $pageIndex, $pageSize);
 				$this->load->view('json', $data);
 				return;
 			}

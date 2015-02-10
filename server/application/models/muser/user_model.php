@@ -43,10 +43,7 @@
 		}
 		public function get_user_by_name($name)
 		{
-			$data = array(
-				'name'=>$name
-			);
-			$this->db->where($data);
+			$this->db->like('name', $name);
 			$query = $this->db->get('t_user');
 			$data = $query->result_array();
 			return array(
@@ -72,7 +69,7 @@
 				'name'=>$name,
 				'type'=>$type
 			);
-			$this->db->where($data);
+			$this->db->like($data);
 			$query = $this->db->get('t_user');
 			$data = $query->result_array();
 			return array(
