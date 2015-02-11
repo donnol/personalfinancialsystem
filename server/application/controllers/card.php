@@ -15,6 +15,7 @@ class Card extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 
 		$name = $this->input->get('name');
 		$remark = $this->input->get('remark');
@@ -23,24 +24,24 @@ class Card extends CI_Controller{
 
 		if( $name != '' && $remark != '' )
 		{
-			$data['json'] = $this->card_service->get_card_like_name_and_remark($name, $remark, $pageIndex, $pageSize);
+			$data['json'] = $this->card_service->get_card_like_name_and_remark($userId, $name, $remark, $pageIndex, $pageSize);
 			$this->load->view('json', $data);
 			return;
 		}
 		if( $name != '' )
 		{
-			$data['json'] = $this->card_service->get_card_like_name($name, $pageIndex, $pageSize);
+			$data['json'] = $this->card_service->get_card_like_name($userId, $name, $pageIndex, $pageSize);
 			$this->load->view('json', $data);
 			return;
 		}
 		if( $remark != '' )
 		{
-			$data['json'] = $this->card_service->get_card_like_remark($remark, $pageIndex, $pageSize);
+			$data['json'] = $this->card_service->get_card_like_remark($userId, $remark, $pageIndex, $pageSize);
 			$this->load->view('json', $data);
 			return;
 		}
 
-		$data['json'] = $this->card_service->get_all_card($pageIndex, $pageSize);
+		$data['json'] = $this->card_service->get_all_card($userId, $pageIndex, $pageSize);
 		$this->load->view('json', $data);
 	}
 	public function get()
@@ -52,9 +53,10 @@ class Card extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 
 		$cardId = $this->input->get('cardId');
-		$data['json'] = $this->card_service->get_card_by_id($cardId);
+		$data['json'] = $this->card_service->get_card_by_id($userId, $cardId);
 		$this->load->view('json', $data);
 	}
 	public function del()
@@ -66,9 +68,10 @@ class Card extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 
 		$cardId = $this->input->post('cardId');
-		$data['json'] = $this->card_service->del($cardId);
+		$data['json'] = $this->card_service->del($userId, $cardId);
 		$this->load->view('json', $data);
 	}
 	public function add()
@@ -80,6 +83,7 @@ class Card extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 		$name = $this->input->post('name');
 		$bank = $this->input->post('bank');
 		$card = $this->input->post('card');
@@ -88,7 +92,7 @@ class Card extends CI_Controller{
 		$createTime = date('Y-m-d H:i:s');
 		$modifyTime = $createTime;
 		
-		$data['json'] = $this->card_service->add($name, $bank, $card, $money, $remark, $createTime, $modifyTime);
+		$data['json'] = $this->card_service->add($userId, $name, $bank, $card, $money, $remark, $createTime, $modifyTime);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -100,6 +104,7 @@ class Card extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 		$cardId = $this->input->post('cardId');
 		$name = $this->input->post('name');
 		$bank = $this->input->post('bank');
@@ -108,7 +113,7 @@ class Card extends CI_Controller{
 		$remark = $this->input->post('remark');
 		$modifyTime = date('Y-m-d H:i:s');
 
-		$data['json'] = $this->card_service->mod($cardId, $name, $bank, $card, $money, $remark, $modifyTime);
+		$data['json'] = $this->card_service->mod($userId, $cardId, $name, $bank, $card, $money, $remark, $modifyTime);
 		$this->load->view('json', $data);
 	}
 }

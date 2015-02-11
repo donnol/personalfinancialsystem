@@ -14,6 +14,7 @@ class Login_service extends CI_Model{
 		$tmp = $data['data'];
 		if( count($tmp) != 0)
 		{
+			$userId = $tmp[0]['userId'];
 			$value = sha1(rand());
 			$t = time();
 			$ip = $this->input->ip_address();
@@ -21,11 +22,13 @@ class Login_service extends CI_Model{
 			$result = $this->cookie_model->get_cookie_by_id($value);
 			if( count($result['data']) != 0 )
 				$value = sha1(rand());
-			setcookie('user', $value, $t+3600, '/', null);
+			$value = $userId.'\t'.$value;
+			$value_encode = base64_encode($value);
+			setcookie('user', $value_encode, $t+3600, '/', null);
 			if($this->agent->is_browser())
 				$user_agent = $this->agent->browser().'/'.$this->agent->version();
 			
-			$this->cookie_model->add_cookie($value, $ip, $user_agent, $t, '');
+			$this->cookie_model->add_cookie($value_encode, $ip, $user_agent, $t, '');
 
 			//		$this->session->set_userdata('user_name', $name);
 
@@ -75,9 +78,19 @@ class Login_service extends CI_Model{
 			if( count($tmp) != 0 && $ip == $tmp[0]['ip_address'] && $user_agent == $tmp[0]['user_agent'] )
 				//	if( $name = $this->session->userdata('user_name') )
 			{
+				$value_decode = base64_decode( $_COOKIE['user'] );
+				list($userId, $key) = explode('\t', $value_decode);
 				return array(
 						'code'=>0,
 						'msg'=>'login',
+						'data'=>$userId
+					    );
+			}
+			else
+			{
+				return array(
+						'code'=>1,
+						'msg'=>'wrong cookie.',
 						'data'=>''
 					    );
 			}

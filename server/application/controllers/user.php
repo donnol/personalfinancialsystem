@@ -15,10 +15,28 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 		$name = $this->input->get('name');
 		$type = $this->input->get('type');
 		$pageIndex = $this->input->get('pageIndex');
 		$pageSize = $this->input->get('pageSize');
+
+		$result = $this->user_service->get_user_by_id($userId);
+		if( $result['data']['type'] != '0' )
+		{
+			$tmp[0] = $result['data'];
+			$tmp_data = array(
+				'count'=>1,
+				'data'=>$tmp
+			);
+			 $data['json'] = array(
+				'code'=>0,
+				'msg'=>'not admin',
+				'data'=>$tmp_data
+			);
+			$this->load->view('json', $data);
+			return;
+		}
 		if($name != '' && $type != '')
 		{
 			$data['json'] = $this->user_service->get_user_by_name_and_type($name, $type, $pageIndex, $pageSize);
@@ -65,6 +83,18 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$adminId = $result['data'];
+		$result = $this->user_service->get_user_by_id($adminId);
+		if( $result['data']['type'] != '0' )
+		{
+			$data['json'] = array(
+				'code'=>1,
+				'msg'=>'you dont have the permission to delete user.',
+				'data'=>''
+			);
+			$this->load->view('json', $data);
+			return;
+		}
 		$userId = $this->input->post('userId');
 
 		$data['json'] = $this->user_service->del($userId);
@@ -79,6 +109,19 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$adminId = $result['data'];
+		$result = $this->user_service->get_user_by_id($adminId);
+		if( $result['data']['type'] != '0' )
+		{
+			$data['json'] = array(
+				'code'=>1,
+				'msg'=>'you dont have the permission to add user.',
+				'data'=>''
+			);
+			$this->load->view('json', $data);
+			return;
+		}
+
 		$name = $this->input->post('name');
 		$password = sha1($this->input->post('password'));
 		$type = $this->input->post('type');
@@ -97,7 +140,31 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$adminId = $result['data'];
+		$result = $this->user_service->get_user_by_id($adminId);
+		if( $result['data']['type'] != '0' )
+		{
+			$data['json'] = array(
+				'code'=>1,
+				'msg'=>'you dont have the permission to mod user.',
+				'data'=>''
+			);
+			$this->load->view('json', $data);
+			return;
+		}
+
 		$userId = $this->input->post('userId');
+		$result = $this->user_service->get_user_by_id($userId);
+		if( $result['data']['type'] == '0' )
+		{
+			$data['json'] = array(
+				'code'=>1,
+				'msg'=>'you cant mod the manager type.',
+				'data'=>''
+			);
+			$this->load->view('json', $data);
+			return;
+		}
 		$type = $this->input->post('type');
 		$modifyTime = date('Y-m-d H:i:s');
 
@@ -113,7 +180,19 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+
 		$userId = $this->input->post('userId');
+		$result = $this->user_service->get_user_by_id($userId);
+		if( $result['data']['type'] == '0' )
+		{
+			$data['json'] = array(
+				'code'=>1,
+				'msg'=>'you cant mod the manager type.',
+				'data'=>''
+			);
+			$this->load->view('json', $data);
+			return;
+		}
 		$password = sha1($this->input->post('password'));
 		$modifyTime = date('Y-m-d H:i:s');
 
