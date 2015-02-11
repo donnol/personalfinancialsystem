@@ -72,7 +72,7 @@
 				'categoryId'=>$categoryId,
 				'cardId'=>$cardId
 			);
-			$this->db->like_or($data);
+			$this->db->or_like($data);
 			$query = $this->db->get('t_account');
 			$data = $query->result_array();
 			return array(

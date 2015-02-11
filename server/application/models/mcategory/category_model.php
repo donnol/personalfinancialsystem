@@ -26,13 +26,58 @@
 				'data'=>$data
 			);
 		}
-		public function get_category_by_name_or_remark($name, $remark)
+		public function get_category_by_name($name)
+		{
+			$this->db->where('name', $name);
+			$query = $this->db->get('t_category');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_category_like_name($name)
+		{
+			$this->db->like('name', $name);
+			$query = $this->db->get('t_category');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_category_by_name_and_remark($name, $remark)
 		{
 			$data = array(
 				'name'=>$name,
 				'remark'=>$remark
 			);
-			$this->db->like_or($data);
+			$this->db->like($data);
+			$query = $this->db->get('t_category');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_category_by_name_or_remark($name, $remark)
+		{
+			$this->db->like('name', $name);
+			$this->db->or_like('remark',$remark);
+			$query = $this->db->get('t_category');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_category_like_remark($remark)
+		{
+			$this->db->like('remark', $remark);
 			$query = $this->db->get('t_category');
 			$data = $query->result_array();
 			return array(
@@ -66,14 +111,14 @@
 				'data'=>''
 			);
 		}
-		public function mod($userId, $name, $remark, $modifyTime)
+		public function mod($categoryId, $name, $remark, $modifyTime)
 		{
 			$data = array(
 				'name'=>$name,
 				'remark'=>$remark,
 				'modifyTime'=>$modifyTime
 			);
-			$this->db->where('userId', $userId);
+			$this->db->where('categoryId', $categoryId);
 			$this->db->update('t_category', $data);
 			return array(
 				'code'=>0,
