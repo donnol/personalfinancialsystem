@@ -5,9 +5,10 @@
 			parent::__construct();
 			$this->load->database();
 		}
-		public function get_all_category($userId)
+		public function get_category_by_name($userId, $name)
 		{
 			$this->db->where('userId', $userId);
+			$this->db->where('name', $name);
 			$query = $this->db->get('t_category');
 			$data = $query->result_array();
 			return array(
@@ -28,63 +29,32 @@
 				'data'=>$data
 			);
 		}
-		public function get_category_by_name($userId, $name)
+		public function search($userId, $where, $limit)
 		{
 			$this->db->where('userId', $userId);
-			$this->db->where('name', $name);
-			$query = $this->db->get('t_category');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_category_like_name($userId, $name)
-		{
+			foreach($where as $key=>$value)
+			{
+				$this->db->like($key, $value);
+			}
+			$num = $this->db->count_all('t_category');
+
 			$this->db->where('userId', $userId);
-			$this->db->like('name', $name);
-			$query = $this->db->get('t_category');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_category_by_name_and_remark($userId,$name, $remark)
-		{
-			$data = array(
-				'name'=>$name,
-				'remark'=>$remark
-			);
-			$this->db->where('userId', $userId);
-			$this->db->like($data);
-			$query = $this->db->get('t_category');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_category_by_name_or_remark($userId, $name, $remark)
-		{
-			$this->db->where('userId', $userId);
-			$this->db->like('name', $name);
-			$this->db->or_like('remark',$remark);
-			$query = $this->db->get('t_category');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_category_like_remark($userId, $remark)
-		{
-			$this->db->where('userId', $userId);
-			$this->db->like('remark', $remark);
+			foreach($where as $key=>$value)
+			{
+				$this->db->like($key, $value);
+			}
+			
+			$index = $limit['pageIndex'];
+			$size = $limit['pageSize'];
+			
+			if( $size != '' )
+			{
+			$limit_size = $num - $index;
+			if( $limit_size <= $size )
+				$size = $limit_size;
+
+			$this->db->limit($size, $index);
+			}
 			$query = $this->db->get('t_category');
 			$data = $query->result_array();
 			return array(

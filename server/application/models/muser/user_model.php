@@ -1,158 +1,129 @@
 <?php
-	class User_model extends CI_Model{
-		public function __construct()
-		{
-			parent::__construct();
-			$this->load->database();
-		}
-		public function get_all_user()
-		{
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
+class User_model extends CI_Model{
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->database();
+	}
+	public function get_user_by_id($userId)
+	{
+		$this->db->where('userId', $userId);
+		$query = $this->db->get('t_user');
+		$data = $query->result_array();
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>$data
-			);
-		}
-		public function get_user_by_id($userId)
-		{
-			$this->db->where('userId', $userId);
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
+			    );
+	}
+	public function get_user_by_name($name)
+	{
+		$this->db->where('name', $name);
+		$query = $this->db->get('t_user');
+		$data = $query->result_array();
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>$data
-			);
-		}
-		public function get_user_by_pwd($pwd)
+			    );
+	}
+	public function search($where, $limit)
+	{
+		foreach($where as $key=>$value)
 		{
-			$this->db->where('password', $pwd);
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
+			$this->db->like($key, $value);
+		}
+		$num = $this->db->count_all('t_user');
+
+		foreach($where as $key=>$value)
+		{
+			$this->db->like($key, $value);
+		}
+
+		$size = $limit['pageSize'];
+		$limit_size = $num - $limit['pageIndex'];
+		if( $size != '')
+		{
+			if( $limit_size <= $size )
+				$size = $limit_size;
+
+			$this->db->limit($size, $limit['pageIndex']);
+		}
+		$query = $this->db->get('t_user');
+		$data = $query->result_array();
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>$data
-			);
-		}
-		public function get_user_by_name_and_pwd($name, $password)
-		{
-			$data = array(
-				'name'=>$name,
-				'password'=>$password
-			);	
-			$this->db->where($data);
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_user_by_name($name)
-		{
-			$this->db->like('name', $name);
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_user_by_type($type)
-		{
-			$this->db->where('type', $type);
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_user_by_name_and_type($name, $type)
-		{
-			$data = array(
-				'name'=>$name,
-				'type'=>$type
-			);
-			$this->db->like($data);
-			$query = $this->db->get('t_user');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function del($userId)
-		{
-			$this->db->where('userId', $userId);
-			$this->db->delete('t_user');
-			return array(
+			    );
+	}
+	public function del($userId)
+	{
+		$this->db->where('userId', $userId);
+		$this->db->delete('t_user');
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
-			);
-		}
-		public function add($name, $password, $type)
-		{
-			$data = array(
+			    );
+	}
+	public function add($name, $password, $rand_value, $type)
+	{
+		$data = array(
 				'name'=>$name,
 				'password'=>$password,
-				'type'=>$type,
-			);
-			$this->db->insert('t_user', $data);
-			return array(
+				'randKeys' =>$rand_value, 
+				'type'=>$type
+			     );
+		$this->db->insert('t_user', $data);
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
-			);
-		}
-		public function mod($userId, $name, $password, $type)
-		{
-			$data = array(
+			    );
+	}
+	public function mod($userId, $name, $password, $rand_value, $type)
+	{
+		$data = array(
 				'name'=>$name,
 				'password'=>$password,
-				'type'=>$type,
-			);
-			$this->db->where('userId', $userId);
-			$this->db->update('t_user', $data);
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>''
-			);
-		}
-		public function mod_user_type($userId, $type)
-		{
-			$data = array(
+				'randKeys'=>$rand_value,
 				'type'=>$type
-			);
-			$this->db->where('userId', $userId);
-			$this->db->update('t_user', $data);
-			return array(
+			     );
+		$this->db->where('userId', $userId);
+		$this->db->update('t_user', $data);
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
-			);
-		}
-		public function mod_user_pwd($userId, $pwd)
-		{
-			$data = array(
-				'password'=>$pwd
-			);
-			$this->db->where('userId', $userId);
-			$this->db->update('t_user', $data);
-			return array(
+			    );
+	}
+	public function mod_user_type($userId, $type)
+	{
+		$data = array(
+				'type'=>$type
+			     );
+		$this->db->where('userId', $userId);
+		$this->db->update('t_user', $data);
+		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>''
-			);
-		}
+			    );
+	}
+	public function mod_user_pwd($userId, $pwd, $rand_value)
+	{
+		$data = array(
+				'password'=>$pwd,
+				'randKeys'=>$rand_value
+			     );
+		$this->db->where('userId', $userId);
+		$this->db->update('t_user', $data);
+		return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>''
+			    );
+	}
 }
 

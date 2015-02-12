@@ -5,64 +5,6 @@ class User_service extends CI_Model{
 		parent::__construct();
 		$this->load->model('muser/user_model', 'user_model');
 	}
-	public function get_all_user($pageIndex, $pageSize)
-	{
-		$data = $this->user_model->get_all_user();
-		$num = count($data['data']);
-		if( $num == 0 )
-			return array(
-					'code'=>1,
-					'msg'=>'no data',
-					'data'=>''
-				    );
-		if( $pageSize < $num)
-		{
-			$leave = $num - $pageIndex;
-			$t = 0;
-			if($leave > $pageSize)
-			{
-				for($i = $pageIndex; $i < ($pageIndex + $pageSize); $i++)
-				{
-					$tdata[$t++] = $data['data'][$i];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-			else
-			{
-				for($k = $pageIndex; $k < ($pageIndex + $leave); $k++)
-				{
-					$tdata[$t++] = $data['data'][$k];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-		}	
-		$result = array(
-				'count'=>$num,
-				'data'=>$data['data']
-			       );
-
-		return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$result
-			    );
-	}
 	public function get_user_by_id($userId)
 	{
 		$data = $this->user_model->get_user_by_id($userId);
@@ -79,121 +21,6 @@ class User_service extends CI_Model{
 				'data'=>$data['data'][0]
 			    );
 	}
-	public function get_user_by_name($name, $pageIndex, $pageSize)
-	{
-		$data = $this->user_model->get_user_by_name($name);
-		$num = count($data['data']);
-		if( $num == 0 )
-			return array(
-					'code'=>1,
-					'msg'=>'no data',
-					'data'=>''
-				    );
-		if( $pageSize < $num)
-		{
-			$leave = $num - $pageIndex;
-			$t = 0;
-			if($leave > $pageSize)
-			{
-				for($i = $pageIndex; $i < ($pageIndex + $pageSize); $i++)
-				{
-					$tdata[$t++] = $data['data'][$i];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-			else
-			{
-				for($k = $pageIndex; $k < ($pageIndex + $leave); $k++)
-				{
-					$tdata[$t++] = $data['data'][$k];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-		}	
-
-		$result = array(
-				'count'=>$num,
-				'data'=>$data['data']
-			       );
-		return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$result
-			    );
-	}
-	public function get_user_by_type($type, $pageIndex, $pageSize)
-	{
-		$data = $this->user_model->get_user_by_type($type);
-		$num = count($data['data']);
-		if( $num == 0 )
-			return array(
-					'code'=>1,
-					'msg'=>'no data',
-					'data'=>''
-				    );
-		if( $pageSize < $num)
-		{
-			$leave = $num - $pageIndex;
-			$t = 0;
-			if($leave > $pageSize)
-			{
-				for($i = $pageIndex; $i < ($pageIndex + $pageSize); $i++)
-				{
-					$tdata[$t++] = $data['data'][$i];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-			else
-			{
-				for($k = $pageIndex; $k < ($pageIndex + $leave); $k++)
-				{
-					$tdata[$t++] = $data['data'][$k];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-		}		    
-		$result = array(
-				'count'=>$num,
-				'data'=>$data['data']
-			       );
-		return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$result
-			    );
-	}
 	public function del($userId)
 	{
 		$data = $this->user_model->del($userId);
@@ -208,8 +35,10 @@ class User_service extends CI_Model{
 					'msg'=>'name is already exist.',
 					'data'=>''
 				    );
+		$rand_value = rand();
+		$password .= $rand_value;
 		$password = sha1($password);
-		$data = $this->user_model->add($name, $password, $type);
+		$data = $this->user_model->add($name, $password, $rand_value, $type);
 		return $data;
 	}
 	public function mod_user_type($userId, $type)
@@ -219,83 +48,51 @@ class User_service extends CI_Model{
 	}
 	public function mod_user_pwd($userId, $pwd)
 	{
+		$rand_value = rand();
+		$pwd .= $rand_value;
 		$pwd = sha1($pwd);
-		$data = $this->user_model->mod_user_pwd($userId, $pwd);
+		$data = $this->user_model->mod_user_pwd($userId, $pwd, $rand_value);
 		return $data;
 	}
-	public function mod_old_pwd($old, $new)
+	public function mod_old_pwd($userId, $old, $new)
 	{
-		$old = sha1($old);
-		$data = $this->user_model->get_user_by_pwd($old);
+		$data = $this->user_model->get_user_by_id($userId);
 		$tmp = $data['data'];
-		$userId = $tmp[0]['userId'];
 		if( count($data['data']) != 0 )
 		{
+			$rand_value = $tmp[0]['randKeys'];
+			$old .= $rand_value;
+			$old = sha1($old);
+			if( $old != $tmp[0]['password'] )
+				return array(
+					'code'=>1,
+					'msg'=>'check your password.',
+					'data'=>''
+				);
+			$rand_value = rand();
+			$new .= $rand_value;
 			$new = sha1($new);
-			$data = $this->user_model->mod_user_pwd($userId, $new);
+			$data = $this->user_model->mod_user_pwd($userId, $new, $rand_value);
 			return $data;
 		}
 		return array(
 				'code'=>1,
-				'msg'=>'wrong password',
+				'msg'=>'check your password',
 				'data'=>''
 			    );
 	}
-	public function get_user_by_name_and_type($name, $type, $pageIndex, $pageSize)
+	public function search($where, $limit)
 	{
-		$data = $this->user_model->get_user_by_name_and_type($name, $type);
+		$data = $this->user_model->search($where, $limit);
 		$num = count($data['data']);
-		if( $num == 0)
-			return array(
-					'code'=>1,
-					'msg'=>'no data',
-					'data'=>''
-				    );
-		if( $pageSize < $num)
-		{
-			$leave = $num - $pageIndex;
-			$t = 0;
-			if($leave > $pageSize)
-			{
-				for($i = $pageIndex; $i < ($pageIndex + $pageSize); $i++)
-				{
-					$tdata[$t++] = $data['data'][$i];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-			else
-			{
-				for($k = $pageIndex; $k < ($pageIndex + $leave); $k++)
-				{
-					$tdata[$t++] = $data['data'][$k];
-				}
-				$result = array(
-						'count'=>$num,
-						'data'=>$tdata
-					       );
-				return array(
-						'code'=>0,
-						'msg'=>'',
-						'data'=>$result
-					    );
-			}
-		}	
 		$result = array(
-				'count'=>$num,
-				'data'=>$data['data']
-			       );
+			'count'=>$num,
+			'data'=>$data['data']
+		);
 		return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$result
-			    );
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$result
+		);
 	}
 } 

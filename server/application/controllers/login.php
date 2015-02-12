@@ -8,7 +8,7 @@
 		public function checkin()
 		{
 			$name = $this->input->post('name');
-			$pwd = sha1($this->input->post('password'));
+			$pwd = $this->input->post('password');
 			$data['json'] = $this->login_service->checkin($name, $pwd);
 			$this->load->view('json', $data);
 		}

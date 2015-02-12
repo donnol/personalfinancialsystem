@@ -5,6 +5,8 @@ class Account extends CI_Controller{
 		parent::__construct();
 		$this->load->model('maccount/account_service', 'account_service');
 		$this->load->model('muser/login_service', 'login_service');
+		$this->load->model('mcard/card_service', 'card_service');
+		$this->load->model('mcategory/category_service', 'category_service');
 	}
 	public function search()
 	{
@@ -15,41 +17,31 @@ class Account extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 
-		$name = $this->input->post('name');
-		$remark = $this->input->post('remark');
-		$type = $this->input->post('type');
-		$categoryId = $this->input->post('categoryId');
-		$cardId = $this->input->post('cardId');
+		$name = $this->input->get('name');
+		$remark = $this->input->get('remark');
+		$type = $this->input->get('type');
+		$categoryId = $this->input->get('categoryId');
+		$cardId = $this->input->get('cardId');
 		$pageIndex = $this->input->get('pageIndex');
 		$pageSize = $this->input->get('pageSize');
 
-		/*if( $name!='' && $remark!='' )
-		  {
-		  $data['json'] = $this->account_service->get_account_by_name_and_remark($name, $remark, $pageIndex, $pageSize);
-		  $this->load->view('json', $data);
-		  return;
-		  }
-		  if( $name!='' )
-		  {
-		  $data['json'] = $this->account_service->get_account_by_name($name, $pageIndex, $pageSize);
-		  $this->load->view('json', $data);
-		  return;
-		  }
-		  if( $remark!='' )
-		  {
-		  $data['json'] = $this->account_service->get_account_by_remark($remark, $pageIndex, $pageSize);
-		  $this->load->view('json',$data);
-		  return;
-		  }*/
-		if( $name!='' OR $remark!='' OR $type!='' OR $categoryId!='' OR $cardId!='' )
-		{
-			$data['json'] = $this->account_service->get_account_by_or($name, $remark, $type, $categoryId, $cardId, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
+		$id = array(
+			'categoryId'=>$categoryId,
+			'cardId'=>$cardId,
+			'type'=>$type
+		);
+		$where = array(
+			'name'=>$name,
+			'remark'=>$remark
+		);
+		$limit = array(
+			'pageIndex'=>$pageIndex,
+			'pageSize'=>$pageSize
+		);
 
-		$data['json'] = $this->account_service->get_all_account($pageIndex, $pageSize);
+		$data['json'] = $this->account_service->search($userId, $id, $where, $limit);
 		$this->load->view('json', $data);
 	}
 	public function get()
@@ -61,10 +53,10 @@ class Account extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
+		$accountId = $this->input->get('accountId');
 
-		$accountId = $this->input->post('accountId');
-
-		$data['json'] = $this->account_service->get_account_by_id($accountId);
+		$data['json'] = $this->account_service->get_account_by_id($userId, $accountId);
 		$this->load->view('json', $data);
 	}
 	public function del()
@@ -76,10 +68,10 @@ class Account extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-
+		$userId = $result['data'];
 		$accountId = $this->input->post('accountId');
 
-		$data['json'] = $this->account_service->del($accountId);
+		$data['json'] = $this->account_service->del($userId, $accountId);
 		$this->load->view('json', $data);
 	}
 	public function add()
@@ -92,6 +84,7 @@ class Account extends CI_Controller{
 			return;
 		}
 
+		$userId = $result['data'];
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
 		$money = $this->input->post('money');
@@ -99,7 +92,7 @@ class Account extends CI_Controller{
 		$categoryId = $this->input->post('categoryId');
 		$cardId = $this->input->post('cardId');
 
-		$data['json'] = $this->account_service->add($name, $money, $type, $categoryId, $cardId, $remark);
+		$data['json'] = $this->account_service->add($userId, $name, $money, $type, $categoryId, $cardId, $remark);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -112,6 +105,8 @@ class Account extends CI_Controller{
 			return;
 		}
 
+		$userId = $result['data'];
+		$accountId = $this->input->post('accountId');
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
 		$money = $this->input->post('money');
@@ -119,7 +114,7 @@ class Account extends CI_Controller{
 		$categoryId = $this->input->post('categoryId');
 		$cardId = $this->input->post('cardId');
 
-		$data['json'] = $this->account_service->mod($name, $money, $type, $catogoryId, $cardId, $remark);
+		$data['json'] = $this->account_service->mod($userId, $accountId,  $name, $money, $type, $categoryId, $cardId, $remark);
 		$this->load->view('json', $data);
 	}
 }

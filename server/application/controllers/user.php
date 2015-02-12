@@ -37,27 +37,16 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		if($name != '' && $type != '')
-		{
-			$data['json'] = $this->user_service->get_user_by_name_and_type($name, $type, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
-		if($name != '')
-		{
-			$data['json'] = $this->user_service->get_user_by_name($name, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
-		if($type != '')
-		{
-			$data['json'] = $this->user_service->get_user_by_type($type, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
+		$where = array(
+				'name'=>$name,
+				'type'=>$type
+			      );
+		$limit = array(
+				'pageIndex'=>$pageIndex,
+				'pageSize'=>$pageSize
+			      );
 
-
-		$data['json'] = $this->user_service->get_all_user($pageIndex, $pageSize);
+		$data['json'] = $this->user_service->search($where, $limit);
 		$this->load->view('json', $data);
 	}
 	public function get()
@@ -213,10 +202,11 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
+		$userId = $result['data'];
 		$old = $this->input->post('oldPassword');
 		$new = $this->input->post('newPassword');
 
-		$data['json'] = $this->user_service->mod_old_pwd($old, $new);
+		$data['json'] = $this->user_service->mod_old_pwd($userId, $old, $new);
 		$this->load->view('json', $data);
 	}
 }	

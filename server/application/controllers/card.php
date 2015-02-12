@@ -22,26 +22,16 @@ class Card extends CI_Controller{
 		$pageIndex = $this->input->get('pageIndex');
 		$pageSize = $this->input->get('pageSize');
 
-		if( $name != '' && $remark != '' )
-		{
-			$data['json'] = $this->card_service->get_card_like_name_and_remark($userId, $name, $remark, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
-		if( $name != '' )
-		{
-			$data['json'] = $this->card_service->get_card_like_name($userId, $name, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
-		if( $remark != '' )
-		{
-			$data['json'] = $this->card_service->get_card_like_remark($userId, $remark, $pageIndex, $pageSize);
-			$this->load->view('json', $data);
-			return;
-		}
+		$where = array(
+			'name'=>$name,
+			'remark'=>$remark
+		);
+		$limit = array(
+			'pageIndex'=>$pageIndex,
+			'pageSize'=>$pageSize
+		);
 
-		$data['json'] = $this->card_service->get_all_card($userId, $pageIndex, $pageSize);
+		$data['json'] = $this->card_service->search($userId, $where, $limit);
 		$this->load->view('json', $data);
 	}
 	public function get()

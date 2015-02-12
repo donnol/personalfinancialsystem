@@ -9,10 +9,19 @@ class Login_service extends CI_Model{
 	}
 	public function checkin($name, $pwd)
 	{
-		$data = $this->user_model->get_user_by_name_and_pwd($name, $pwd);
+		$data = $this->user_model->get_user_by_name($name);
 		$tmp = $data['data'];
 		if( count($tmp) != 0)
 		{
+			$rand_value = $tmp[0]['randKeys'];
+			$pwd .= $rand_value;
+			$pwd = sha1($pwd);
+			if( $pwd != $tmp[0]['password'] )
+				return array(
+					'code'=>1,
+					'msg'=>'login failed, please check your account!',
+					'data'=>''
+				);
 			$userId = $tmp[0]['userId'];
 			$t = time();
 			$ip = $this->input->ip_address();
