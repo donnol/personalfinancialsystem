@@ -43,7 +43,6 @@ class User_model extends CI_Model{
 		if( isset($limit['pageSize']) && isset($limit['pageIndex']))
 		{
 			$size = $limit['pageSize'];
-			$limit_size = $num - $limit['pageIndex'];
 			$this->db->limit($size, $limit['pageIndex']);
 		}
 		$query = $this->db->get('t_user');

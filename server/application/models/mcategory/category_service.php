@@ -4,6 +4,7 @@ class Category_service extends CI_Model{
 	{
 		parent::__construct();
 		$this->load->model('mcategory/category_model', 'category_model');
+		$this->load->model('maccount/account_model', 'account_model');
 	}
 	public function search($userId, $where, $limit)
 	{
@@ -30,7 +31,14 @@ class Category_service extends CI_Model{
 	}
 	public function del($userId, $categoryId)
 	{
+		$array = array(
+			'categoryId'=>$categoryId
+		);
 		$data = $this->category_model->del($userId, $categoryId);
+		$category = array(
+			'categoryId'=>'0'
+		);
+		$this->account_model->mod($array, $category);
 		return $data;
 	}
 	public function add($userId,$name, $remark)

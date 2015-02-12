@@ -39,7 +39,7 @@ class User_service extends CI_Model{
 					'msg'=>'name is already exist.',
 					'data'=>''
 				    );
-		$rand_value = rand();
+		$rand_value = uniqid();
 		$password .= $rand_value;
 		$password = sha1($password);
 		$array = array(
@@ -61,7 +61,7 @@ class User_service extends CI_Model{
 	}
 	public function mod_user_pwd($userId, $pwd)
 	{
-		$rand_value = rand();
+		$rand_value = uniqid();
 		$pwd .= $rand_value;
 		$pwd = sha1($pwd);
 		$array = array(
@@ -88,7 +88,7 @@ class User_service extends CI_Model{
 					'msg'=>'check your password.',
 					'data'=>''
 				);
-			$rand_value = rand();
+			$rand_value = uniqid();
 			$new .= $rand_value;
 			$new = sha1($new);
 			$array = array(

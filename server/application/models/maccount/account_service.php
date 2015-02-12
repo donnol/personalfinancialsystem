@@ -5,9 +5,9 @@ class Account_service extends CI_Model{
 		parent::__construct();
 		$this->load->model('maccount/account_model', 'account_model');
 	}
-	public function search($userId, $id, $where, $limit)
+	public function search($where, $limit)
 	{
-		$data = $this->account_model->search($userId, $id, $where, $limit);
+		$data = $this->account_model->search($where, $limit);
 		$num = count($data['data']);
 		$result = array(
 			'count'=>$num,
@@ -57,7 +57,7 @@ class Account_service extends CI_Model{
 		$data = $this->account_model->add($userId, $name, $money, $type, $categoryId, $cardId, $remark);
 		return $data;
 	}
-	public function mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark)
+	/*public function mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark)
 	{
 		$data = $this->account_model->get_account_by_id($userId, $accountId);
 		$tmp = $data['data'];
@@ -78,7 +78,29 @@ class Account_service extends CI_Model{
 				'msg'=>'name is already exist.',
 				'data'=>''
 			);
+		
 		$data = $this->account_model->mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark);
 		return $data;
+	}*/
+	public function mod($where, $data)
+	{
+		$result = $this->account_model->get_account_by_id($where['userId'], $where['accountId']);
+		$accounts = $result['data'];
+		if( $accounts[0]['name'] == $name )
+		{
+			$result = $this->account_model->mod($where, $data);
+			return $result;
+		}
+		$result = $this->account_model->get_account_by_name($where['userId'], $data['name']);
+		$num = count($result['data']);
+		if( $num != 0 )
+			return array(
+				'code'=>1,
+				'msg'=>'name is already exist.',
+				'data'=>''
+			);
+
+		$result = $this->account_model->mod($where, $data);
+		return $result;
 	}
 }

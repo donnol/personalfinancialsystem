@@ -5,7 +5,6 @@ class Login_service extends CI_Model{
 		parent::__construct();
 		$this->load->model('muser/user_model', 'user_model');
 		$this->load->model('mcookie/cookie_model', 'cookie_model');
-		$this->load->library('user_agent');
 	}
 	public function checkin($name, $pwd)
 	{
@@ -25,27 +24,10 @@ class Login_service extends CI_Model{
 			$userId = $tmp[0]['userId'];
 			$t = time();
 			$ip = $this->input->ip_address();
-			$user_agent = '';
 			$value = sha1(uniqid('hbb_', TRUE));
 			$value_encode = base64_encode($value);
 			setcookie('user', $value_encode, $t+3600, '/', null);
-			
-			if($this->agent->is_browser())
-			{
-				$user_agent = $this->agent->browser().'/'.$this->agent->version();
-			}
-			elseif($this->agent->is_robot())
-			{
-				$user_agent = $this->agent->robot();
-			}
-			elseif($this->agent->is_mobile())
-			{
-				$user_agent = $this->agent->mobile();
-			}
-			else
-			{
-				$user_agent = 'Unidentified User Agent';
-			}
+			$user_agent = $_SERVER['HTTP_USER_AGENT'];
 			
 			$this->cookie_model->add_cookie($value_encode, $ip, $user_agent, $t, $userId);
 			return array(
@@ -84,23 +66,7 @@ class Login_service extends CI_Model{
 		if(isset($_COOKIE['user']))
 		{
 			$ip = $this->input->ip_address();
-			if($this->agent->is_browser())
-			{
-				$user_agent = $this->agent->browser().'/'.$this->agent->version();
-			}
-			elseif($this->agent->is_robot())
-			{
-				$user_agent = $this->agent->robot();
-			}
-			elseif($this->agent->is_mobile())
-			{
-				$user_agent = $this->agent->mobile();
-			}
-			else
-			{
-				$user_agent = 'Unidentified User Agent';
-			}
-
+			$user_agent = $_SERVER['HTTP_USER_AGENT'];
 			$data = $this->cookie_model->get_cookie_by_id($_COOKIE['user']);
 			$tmp = $data['data'];
 			if( count($tmp) != 0 && $ip == $tmp[0]['ip_address'] && $user_agent == $tmp[0]['user_agent'] )

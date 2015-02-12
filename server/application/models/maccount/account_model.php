@@ -5,39 +5,45 @@ class Account_model extends CI_Model{
 		parent::__construct();
 		$this->load->database();
 	}
-	public function search($userId, $id, $where, $limit)
+	public function search($where, $limit)
 	{
-		$this->db->where('userId', $userId);
-		foreach($id as $key=>$value)
+		/*foreach($where as $key=>$value)
 		{
-			if($value != '')
+			if($key == 'userId' OR $key == 'categoryId' OR $key == 'cardId' )
+			{
 				$this->db->where($key, $value);
-		}
-		foreach($where as $key=>$value)
-		{
-			$this->db->like($key, $value);
-		}
+			}
+			else
+			{
+				$this->db->like($key, $value);
+			}
+		}*/
 		$num = $this->db->count_all('t_account');
 
-		$this->db->where('userId', $userId);
-		foreach($id as $key=>$value)
-		{
-			if($value != '')
-				$this->db->where($key, $value);
-		}
 		foreach($where as $key=>$value)
 		{
-			$this->db->like($key, $value);
+			if($key == 'userId' && $value != '')
+			{
+				$this->db->where($key, $value);
+			}
+			elseif($key == 'categoryId' && $value !='')
+			{
+				$this->db->where($key, $value);
+			}
+			elseif($key == 'cardId' && $value != '')
+			{
+				$this->db->where($key, $value);
+			}
+			else
+			{
+				$this->db->like($key, $value);
+			}
 		}
 
-		$size = $limit['pageSize'];
-		$index = $limit['pageIndex'];
-		if( $size != '')
+		if(isset($limit['pageSize']) && isset($limit['pageIndex']))
 		{
-			$limit_size = $num - $index;
-			if( $limit_size <= $size )
-				$size = $limit_size;
-
+			$size = $limit['pageSize'];
+			$index = $limit['pageIndex'];
 			$this->db->limit($size, $index);
 		}
 		$query = $this->db->get('t_account');
@@ -101,7 +107,7 @@ class Account_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark)
+	/*public function mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark)
 	{
 		$data = array(
 				'name'=>$name,
@@ -119,5 +125,18 @@ class Account_model extends CI_Model{
 				'msg'=>'',
 				'data'=>''
 			    );
+	}*/
+	public function mod($where, $data)
+	{
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
+		$this->db->update('t_account', $data);
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>''
+		);
 	}
 }

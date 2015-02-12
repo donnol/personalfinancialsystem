@@ -27,12 +27,11 @@ class Account extends CI_Controller{
 		$pageIndex = $this->input->get('pageIndex');
 		$pageSize = $this->input->get('pageSize');
 
-		$id = array(
+		$where = array(
+			'userId'=>$userId,
 			'categoryId'=>$categoryId,
 			'cardId'=>$cardId,
-			'type'=>$type
-		);
-		$where = array(
+			'type'=>$type,
 			'name'=>$name,
 			'remark'=>$remark
 		);
@@ -41,7 +40,7 @@ class Account extends CI_Controller{
 			'pageSize'=>$pageSize
 		);
 
-		$data['json'] = $this->account_service->search($userId, $id, $where, $limit);
+		$data['json'] = $this->account_service->search($where, $limit);
 		$this->load->view('json', $data);
 	}
 	public function get()
@@ -114,7 +113,19 @@ class Account extends CI_Controller{
 		$categoryId = $this->input->post('categoryId');
 		$cardId = $this->input->post('cardId');
 
-		$data['json'] = $this->account_service->mod($userId, $accountId,  $name, $money, $type, $categoryId, $cardId, $remark);
+		$where = array(
+			'userId'=>$userId,
+			'accountId'=>$accountId
+		);
+		$data = array(
+			'name'=>$name,
+			'remark'=>$remark,
+			'money'=>$money,
+			'type'=>$type,
+			'categoryId'=>$categoryId,
+			'cardId'=>$cardId
+		);
+		$data['json'] = $this->account_service->mod($where, $data);
 		$this->load->view('json', $data);
 	}
 }
