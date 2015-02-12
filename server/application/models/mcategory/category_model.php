@@ -104,14 +104,12 @@
 				'data'=>''
 			);
 		}
-		public function add($userId, $name, $remark, $createTime, $modifyTime)
+		public function add($userId, $name, $remark)
 		{
 			$data = array(
 				'userId'=>$userId,
 				'name'=>$name,
-				'remark'=>$remark,
-				'createTime'=>$createTime,
-				'modifyTime'=>$modifyTime
+				'remark'=>$remark
 			);
 			$this->db->insert('t_category', $data);
 			return array(
@@ -120,12 +118,11 @@
 				'data'=>''
 			);
 		}
-		public function mod($categoryId, $userId, $name, $remark, $modifyTime)
+		public function mod($categoryId, $userId, $name, $remark)
 		{
 			$data = array(
 				'name'=>$name,
-				'remark'=>$remark,
-				'modifyTime'=>$modifyTime
+				'remark'=>$remark
 			);
 			$this->db->where('categoryId', $categoryId);
 			$this->db->where('userId', $userId);

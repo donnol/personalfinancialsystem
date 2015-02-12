@@ -320,7 +320,7 @@ class Card_service extends CI_Model{
 		$data = $this->card_model->del($userId, $cardId);
 		return $data;
 	}
-	public function add($userId, $name, $bank, $card, $money, $remark, $createTime, $modifyTime)
+	public function add($userId, $name, $bank, $card, $money, $remark)
 	{
 		$data = $this->card_model->get_card_by_name($userId, $name);
 		$num = count($data['data']);
@@ -331,16 +331,16 @@ class Card_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->card_model->add($userId, $name, $bank, $card, $money, $remark, $createTime, $modifyTime);
+		$data = $this->card_model->add($userId, $name, $bank, $card, $money, $remark);
 		return $data;
 	}
-	public function mod($userId, $cardId, $name, $bank, $card, $money, $remark,  $modifyTime)
+	public function mod($userId, $cardId, $name, $bank, $card, $money, $remark)
 	{
 		$result = $this->card_model->get_card_by_id($userId, $cardId);
 		$tmp = $result['data'];
 		if( $tmp[0]['name'] == $name )
 		{	
-			$data = $this->card_model->mod($userId, $cardId, $name, $bank, $card, $money, $remark, $modifyTime);
+			$data = $this->card_model->mod($userId, $cardId, $name, $bank, $card, $money, $remark);
 			return $data;
 		}
 
@@ -353,7 +353,7 @@ class Card_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->card_model->mod($userId, $cardId, $name, $bank, $card, $money, $remark, $modifyTime);
+		$data = $this->card_model->mod($userId, $cardId, $name, $bank, $card, $money, $remark);
 		return $data;
 	}
 }

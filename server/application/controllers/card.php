@@ -89,10 +89,8 @@ class Card extends CI_Controller{
 		$card = $this->input->post('card');
 		$money = $this->input->post('money');
 		$remark = $this->input->post('remark');
-		$createTime = date('Y-m-d H:i:s');
-		$modifyTime = $createTime;
 		
-		$data['json'] = $this->card_service->add($userId, $name, $bank, $card, $money, $remark, $createTime, $modifyTime);
+		$data['json'] = $this->card_service->add($userId, $name, $bank, $card, $money, $remark);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -111,9 +109,8 @@ class Card extends CI_Controller{
 		$card = $this->input->post('card');
 		$money = $this->input->post('money');
 		$remark = $this->input->post('remark');
-		$modifyTime = date('Y-m-d H:i:s');
 
-		$data['json'] = $this->card_service->mod($userId, $cardId, $name, $bank, $card, $money, $remark, $modifyTime);
+		$data['json'] = $this->card_service->mod($userId, $cardId, $name, $bank, $card, $money, $remark);
 		$this->load->view('json', $data);
 	}
 }

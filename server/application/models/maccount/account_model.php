@@ -91,7 +91,7 @@
 				'data'=>''
 			);
 		}
-		public function add($name, $money, $type, $categoryId, $typeId, $remark, $createTime, $modifyTime)
+		public function add($name, $money, $type, $categoryId, $typeId, $remark)
 		{
 			$data = array(
 				'name'=>$name,
@@ -99,9 +99,7 @@
 				'type'=>$type,
 				'categoryId'=>$categoryId,
 				'typeId'=>$typeId,
-				'remark'=>$remark,
-				'createTime'=>$createTime,
-				'modifyTime'=>$modifyTime
+				'remark'=>$remark
 			);
 			$this->db->insert('t_account',$data);
 			return array(
@@ -110,7 +108,7 @@
 				'data'=>''
 			);
 		}
-		public function mod($userId, $name, $money, $type, $categoryId, $typeId, $remark, $modifyTime)
+		public function mod($userId, $name, $money, $type, $categoryId, $typeId, $remark)
 		{
 			$data = array(
 				'name'=>$name,
@@ -118,8 +116,7 @@
 				'type'=>$type,
 				'categoryId'=>$categoryId,
 				'typeId'=>$typeId,
-				'remark'=>$remark,
-				'modifyTime'=>$modifyTime
+				'remark'=>$remark
 			);
 			$this->db->where('userId', $userId);
 			$this->db->update('t_account', $data);

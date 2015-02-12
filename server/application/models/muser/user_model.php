@@ -99,14 +99,12 @@
 				'data'=>''
 			);
 		}
-		public function add($name, $password, $type, $createTime, $modifyTime)
+		public function add($name, $password, $type)
 		{
 			$data = array(
 				'name'=>$name,
 				'password'=>$password,
 				'type'=>$type,
-				'createTime'=>$createTime,
-				'modifyTime'=>$modifyTime
 			);
 			$this->db->insert('t_user', $data);
 			return array(
@@ -115,13 +113,12 @@
 				'data'=>''
 			);
 		}
-		public function mod($userId, $name, $password, $type, $modifyTime)
+		public function mod($userId, $name, $password, $type)
 		{
 			$data = array(
 				'name'=>$name,
 				'password'=>$password,
 				'type'=>$type,
-				'modifyTime'=>$modifyTime
 			);
 			$this->db->where('userId', $userId);
 			$this->db->update('t_user', $data);
@@ -131,11 +128,10 @@
 				'data'=>''
 			);
 		}
-		public function mod_user_type($userId, $type, $modifyTime)
+		public function mod_user_type($userId, $type)
 		{
 			$data = array(
-				'type'=>$type,
-				'modifyTime'=>$modifyTime
+				'type'=>$type
 			);
 			$this->db->where('userId', $userId);
 			$this->db->update('t_user', $data);
@@ -145,11 +141,10 @@
 				'data'=>''
 			);
 		}
-		public function mod_user_pwd($userId, $pwd, $modifyTime)
+		public function mod_user_pwd($userId, $pwd)
 		{
 			$data = array(
-				'password'=>$pwd,
-				'modifyTime'=>$modifyTime
+				'password'=>$pwd
 			);
 			$this->db->where('userId', $userId);
 			$this->db->update('t_user', $data);

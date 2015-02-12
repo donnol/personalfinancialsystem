@@ -26,14 +26,14 @@ class User extends CI_Controller{
 		{
 			$tmp[0] = $result['data'];
 			$tmp_data = array(
-				'count'=>1,
-				'data'=>$tmp
-			);
-			 $data['json'] = array(
-				'code'=>0,
-				'msg'=>'not admin',
-				'data'=>$tmp_data
-			);
+					'count'=>1,
+					'data'=>$tmp
+					);
+			$data['json'] = array(
+					'code'=>0,
+					'msg'=>'not admin',
+					'data'=>$tmp_data
+					);
 			$this->load->view('json', $data);
 			return;
 		}
@@ -88,10 +88,10 @@ class User extends CI_Controller{
 		if( $result['data']['type'] != '0' )
 		{
 			$data['json'] = array(
-				'code'=>1,
-				'msg'=>'you dont have the permission to delete user.',
-				'data'=>''
-			);
+					'code'=>1,
+					'msg'=>'you dont have the permission to delete user.',
+					'data'=>''
+					);
 			$this->load->view('json', $data);
 			return;
 		}
@@ -114,21 +114,19 @@ class User extends CI_Controller{
 		if( $result['data']['type'] != '0' )
 		{
 			$data['json'] = array(
-				'code'=>1,
-				'msg'=>'you dont have the permission to add user.',
-				'data'=>''
-			);
+					'code'=>1,
+					'msg'=>'you dont have the permission to add user.',
+					'data'=>''
+					);
 			$this->load->view('json', $data);
 			return;
 		}
 
 		$name = $this->input->post('name');
-		$password = sha1($this->input->post('password'));
+		$password = $this->input->post('password');
 		$type = $this->input->post('type');
-		$createTime = date('Y-m-d H:i:s');
-		$modifyTime = $createTime;
 
-		$data['json'] = $this->user_service->add($name, $password, $type, $createTime, $modifyTime);
+		$data['json'] = $this->user_service->add($name, $password, $type);
 		$this->load->view('json', $data);
 	}
 	public function modType()
@@ -145,10 +143,10 @@ class User extends CI_Controller{
 		if( $result['data']['type'] != '0' )
 		{
 			$data['json'] = array(
-				'code'=>1,
-				'msg'=>'you dont have the permission to mod user.',
-				'data'=>''
-			);
+					'code'=>1,
+					'msg'=>'you dont have the permission to mod user.',
+					'data'=>''
+					);
 			$this->load->view('json', $data);
 			return;
 		}
@@ -158,17 +156,16 @@ class User extends CI_Controller{
 		if( $result['data']['type'] == '0' )
 		{
 			$data['json'] = array(
-				'code'=>1,
-				'msg'=>'you cant mod the manager type.',
-				'data'=>''
-			);
+					'code'=>1,
+					'msg'=>'you cant mod the manager type.',
+					'data'=>''
+					);
 			$this->load->view('json', $data);
 			return;
 		}
 		$type = $this->input->post('type');
-		$modifyTime = date('Y-m-d H:i:s');
 
-		$data['json'] = $this->user_service->mod_user_type($userId, $type, $modifyTime);
+		$data['json'] = $this->user_service->mod_user_type($userId, $type);
 		$this->load->view('json', $data);
 	}
 	public function modPassword()
@@ -180,23 +177,31 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-
+		$adminId = $result['data'];
+		$result = $this->user_service->get_user_by_id($adminId);
 		$userId = $this->input->post('userId');
-		$result = $this->user_service->get_user_by_id($userId);
+		$password = $this->input->post('password');
 		if( $result['data']['type'] == '0' )
 		{
-			$data['json'] = array(
-				'code'=>1,
-				'msg'=>'you cant mod the manager type.',
-				'data'=>''
-			);
-			$this->load->view('json', $data);
-			return;
+			if($adminId != $userId)
+			{
+				$data['json'] = array(
+						'code'=>1,
+						'msg'=>'you cant mod user password.',
+						'data'=>''
+						);
+				$this->load->view('json', $data);
+				return;
+			}
+			else
+			{
+				$data['json'] = $this->user_service->mod_user_pwd($userId, $password);	
+				$this->load->view('json', $data);
+				return;
+			}
 		}
-		$password = sha1($this->input->post('password'));
-		$modifyTime = date('Y-m-d H:i:s');
 
-		$data['json'] = $this->user_service->mod_user_pwd($userId, $password, $modifyTime);
+		$data['json'] = $this->user_service->mod_user_pwd($userId, $password);
 		$this->load->view('json', $data);
 	}
 	public function modMyPassword()
@@ -208,11 +213,10 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$old = sha1($this->input->post('oldPassword'));
-		$new = sha1($this->input->post('newPassword'));
-		$modifyTime = date('Y-m-d H:i:s');
+		$old = $this->input->post('oldPassword');
+		$new = $this->input->post('newPassword');
 
-		$data['json'] = $this->user_service->mod_old_pwd($old, $new, $modifyTime);
+		$data['json'] = $this->user_service->mod_old_pwd($old, $new);
 		$this->load->view('json', $data);
 	}
 }	

@@ -88,10 +88,8 @@ class Category extends CI_Controller{
 		$userId = $result['data'];
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
-		$createTime = date('Y-m-d H:i:s');
-		$modifyTime = $createTime;
 
-		$data['json'] = $this->category_service->add($userId, $name, $remark, $createTime, $modifyTime);
+		$data['json'] = $this->category_service->add($userId, $name, $remark);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -107,9 +105,8 @@ class Category extends CI_Controller{
 		$categoryId = $this->input->post('categoryId');
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
-		$modifyTime = date('Y-m-d H:i:s');
 
-		$data['json'] = $this->category_service->mod($categoryId, $userId, $name, $remark, $modifyTime);
+		$data['json'] = $this->category_service->mod($categoryId, $userId, $name, $remark);
 		$this->load->view('json', $data);
 	}
 }

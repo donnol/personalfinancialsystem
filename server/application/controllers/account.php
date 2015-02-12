@@ -98,10 +98,8 @@ class Account extends CI_Controller{
 		$type = $this->input->post('type');
 		$categoryId = $this->input->post('categoryId');
 		$cardId = $this->input->post('cardId');
-		$createTime = date('Y-m-d H:i:s');
-		$modifyTime = $createTime;
 
-		$data['json'] = $this->account_service->add($name, $money, $type, $categoryId, $cardId, $remark, $createTime, $modifyTime);
+		$data['json'] = $this->account_service->add($name, $money, $type, $categoryId, $cardId, $remark);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -120,9 +118,8 @@ class Account extends CI_Controller{
 		$type = $this->input->post('type');
 		$categoryId = $this->input->post('categoryId');
 		$cardId = $this->input->post('cardId');
-		$modifyTime = date('Y-m-d H:i:s', time());
 
-		$data['json'] = $this->account_service->mod($name, $money, $type, $catogoryId, $cardId, $remark, $modifyTime);
+		$data['json'] = $this->account_service->mod($name, $money, $type, $catogoryId, $cardId, $remark);
 		$this->load->view('json', $data);
 	}
 }

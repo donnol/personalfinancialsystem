@@ -4,7 +4,6 @@ class Login_service extends CI_Model{
 	{
 		parent::__construct();
 		$this->load->model('muser/user_model', 'user_model');
-		//	$this->load->library('session');
 		$this->load->model('mcookie/cookie_model', 'cookie_model');
 		$this->load->library('user_agent');
 	}
@@ -15,23 +14,31 @@ class Login_service extends CI_Model{
 		if( count($tmp) != 0)
 		{
 			$userId = $tmp[0]['userId'];
-			$value = sha1(rand());
 			$t = time();
 			$ip = $this->input->ip_address();
 			$user_agent = '';
-			$result = $this->cookie_model->get_cookie_by_id($value);
-			if( count($result['data']) != 0 )
-				$value = sha1(rand());
-			$value = $userId.'\t'.$value;
+			$value = sha1(uniqid('hbb_', TRUE));
 			$value_encode = base64_encode($value);
 			setcookie('user', $value_encode, $t+3600, '/', null);
-			if($this->agent->is_browser())
-				$user_agent = $this->agent->browser().'/'.$this->agent->version();
 			
-			$this->cookie_model->add_cookie($value_encode, $ip, $user_agent, $t, '');
-
-			//		$this->session->set_userdata('user_name', $name);
-
+			if($this->agent->is_browser())
+			{
+				$user_agent = $this->agent->browser().'/'.$this->agent->version();
+			}
+			elseif($this->agent->is_robot())
+			{
+				$user_agent = $this->agent->robot();
+			}
+			elseif($this->agent->is_mobile())
+			{
+				$user_agent = $this->agent->mobile();
+			}
+			else
+			{
+				$user_agent = 'Unidentified User Agent';
+			}
+			
+			$this->cookie_model->add_cookie($value_encode, $ip, $user_agent, $t, $userId);
 			return array(
 					'code'=>0,
 					'msg'=>'login successfully.',
@@ -46,9 +53,6 @@ class Login_service extends CI_Model{
 	}
 	public function checkout()
 	{
-		//setcookie('user', '', time()-3600);
-		//	$this->session->unset_userdata('user_name');
-		//	$this->session->sess_destroy();
 		if(isset($_COOKIE['user']))
 		{
 			$val = $_COOKIE['user'];
@@ -71,15 +75,28 @@ class Login_service extends CI_Model{
 		if(isset($_COOKIE['user']))
 		{
 			$ip = $this->input->ip_address();
-			if( $this->agent->is_browser())
+			if($this->agent->is_browser())
+			{
 				$user_agent = $this->agent->browser().'/'.$this->agent->version();
+			}
+			elseif($this->agent->is_robot())
+			{
+				$user_agent = $this->agent->robot();
+			}
+			elseif($this->agent->is_mobile())
+			{
+				$user_agent = $this->agent->mobile();
+			}
+			else
+			{
+				$user_agent = 'Unidentified User Agent';
+			}
+
 			$data = $this->cookie_model->get_cookie_by_id($_COOKIE['user']);
 			$tmp = $data['data'];
 			if( count($tmp) != 0 && $ip == $tmp[0]['ip_address'] && $user_agent == $tmp[0]['user_agent'] )
-				//	if( $name = $this->session->userdata('user_name') )
 			{
-				$value_decode = base64_decode( $_COOKIE['user'] );
-				list($userId, $key) = explode('\t', $value_decode);
+				$userId = $tmp[0]['user_data'];
 				return array(
 						'code'=>0,
 						'msg'=>'login',
@@ -90,7 +107,7 @@ class Login_service extends CI_Model{
 			{
 				return array(
 						'code'=>1,
-						'msg'=>'wrong cookie.',
+						'msg'=>'login failed.',
 						'data'=>''
 					    );
 			}

@@ -91,7 +91,7 @@
 				'data'=>''
 			);
 		}
-		public function add($userId, $name, $bank, $card, $money, $remark, $createTime, $modifyTime)
+		public function add($userId, $name, $bank, $card, $money, $remark)
 		{
 			$data = array(
 				'userId'=>$userId,
@@ -99,9 +99,7 @@
 				'bank'=>$bank,
 				'card'=>$card,
 				'money'=>$money,
-				'remark'=>$remark,
-				'createTime'=>$createTime,
-				'modifyTime'=>$modifyTime
+				'remark'=>$remark
 			);
 			$this->db->insert('t_card', $data);
 			return array(
@@ -110,15 +108,14 @@
 				'data'=>''
 			);
 		}
-		public function mod($userId, $cardId, $name, $bank, $card, $money, $remark, $modifyTime)
+		public function mod($userId, $cardId, $name, $bank, $card, $money, $remark)
 		{
 			$data = array(
 				'name'=>$name,
 				'bank'=>$bank,
 				'card'=>$card,
 				'money'=>$money,
-				'remark'=>$remark,
-				'modifyTime'=>$modifyTime
+				'remark'=>$remark
 			);
 			$this->db->where('userId', $userId);
 			$this->db->where('cardId', $cardId);

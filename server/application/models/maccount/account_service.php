@@ -314,7 +314,7 @@ class Account_service extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function add($name, $money, $type, $categoryId, $cardId, $remark, $createTime, $modifyTime)
+	public function add($name, $money, $type, $categoryId, $cardId, $remark)
 	{
 		$data = $this->account_model->get_account_by_name($name);
 		$num = $data['data'];
@@ -324,7 +324,7 @@ class Account_service extends CI_Model{
 					'msg'=>'name is already exist',
 					'data'=>''
 				    );
-		$this->account_model->add($name, $money, $type, $categoryId, $cardId, $remark, $createTime, $modifyTime);
+		$this->account_model->add($name, $money, $type, $categoryId, $cardId, $remark);
 		return array(
 				'code'=>0,
 				'msg'=>'',

@@ -199,7 +199,7 @@ class User_service extends CI_Model{
 		$data = $this->user_model->del($userId);
 		return $data;
 	}
-	public function add($name, $password, $type, $createTime, $modifyTime)
+	public function add($name, $password, $type)
 	{
 		$data = $this->user_model->get_user_by_name($name);
 		if( count($data['data']) != 0 )
@@ -208,27 +208,31 @@ class User_service extends CI_Model{
 					'msg'=>'name is already exist.',
 					'data'=>''
 				    );
-		$data = $this->user_model->add($name, $password, $type, $createTime, $modifyTime);
+		$password = sha1($password);
+		$data = $this->user_model->add($name, $password, $type);
 		return $data;
 	}
-	public function mod_user_type($userId, $type, $modifyTime)
+	public function mod_user_type($userId, $type)
 	{
-		$data = $this->user_model->mod_user_type($userId, $type, $modifyTime);
+		$data = $this->user_model->mod_user_type($userId, $type);
 		return $data;
 	}
-	public function mod_user_pwd($userId, $pwd, $modifyTime)
+	public function mod_user_pwd($userId, $pwd)
 	{
-		$data = $this->user_model->mod_user_pwd($userId, $pwd, $modifyTime);
+		$pwd = sha1($pwd);
+		$data = $this->user_model->mod_user_pwd($userId, $pwd);
 		return $data;
 	}
-	public function mod_old_pwd($old, $new, $modifyTime)
+	public function mod_old_pwd($old, $new)
 	{
+		$old = sha1($old);
 		$data = $this->user_model->get_user_by_pwd($old);
 		$tmp = $data['data'];
 		$userId = $tmp[0]['userId'];
 		if( count($data['data']) != 0 )
 		{
-			$data = $this->user_model->mod_user_pwd($userId, $new, $modifyTime);
+			$new = sha1($new);
+			$data = $this->user_model->mod_user_pwd($userId, $new);
 			return $data;
 		}
 		return array(

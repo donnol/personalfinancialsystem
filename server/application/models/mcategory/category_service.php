@@ -309,7 +309,7 @@ class Category_service extends CI_Model{
 		$data = $this->category_model->del($userId, $categoryId);
 		return $data;
 	}
-	public function add($userId,$name, $remark, $createTime, $modifyTime)
+	public function add($userId,$name, $remark)
 	{
 		$result = $this->category_model->get_category_by_name($userId, $name);
 		$num = count($result['data']);
@@ -320,16 +320,16 @@ class Category_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->category_model->add($userId, $name, $remark, $createTime, $modifyTime);
+		$data = $this->category_model->add($userId, $name, $remark);
 		return $data;
 	}
-	public function mod($categoryId, $userId, $name, $remark, $modifyTime)
+	public function mod($categoryId, $userId, $name, $remark)
 	{
 		$result = $this->category_model->get_category_by_id($userId, $categoryId);
 		$tmp = $result['data'];
 		if( $tmp[0]['name'] == $name )
 		{
-			$data = $this->category_model->mod($categoryId, $userId, $name, $remark, $modifyTime);
+			$data = $this->category_model->mod($categoryId, $userId, $name, $remark);
 			return array(
 				'code'=>0,
 				'msg'=>'',
@@ -346,7 +346,7 @@ class Category_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->category_model->mod($categoryId, $userId, $name, $remark, $modifyTime);
+		$data = $this->category_model->mod($categoryId, $userId, $name, $remark);
 		return $data;
 	}
 }
