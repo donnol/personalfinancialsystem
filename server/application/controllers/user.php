@@ -115,7 +115,12 @@ class User extends CI_Controller{
 		$password = $this->input->post('password');
 		$type = $this->input->post('type');
 
-		$data['json'] = $this->user_service->add($name, $password, $type);
+		$array = array(
+			'name'=>$name,
+			'password'=>$password,
+			'type'=>$type
+		);
+		$data['json'] = $this->user_service->add($array);
 		$this->load->view('json', $data);
 	}
 	public function modType()
@@ -205,8 +210,12 @@ class User extends CI_Controller{
 		$userId = $result['data'];
 		$old = $this->input->post('oldPassword');
 		$new = $this->input->post('newPassword');
+		$array = array(
+			'old'=>$old,
+			'new'=>$new
+		);
 
-		$data['json'] = $this->user_service->mod_old_pwd($userId, $old, $new);
+		$data['json'] = $this->user_service->mod_old_pwd($userId, $array);
 		$this->load->view('json', $data);
 	}
 }	

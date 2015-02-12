@@ -26,8 +26,12 @@ class User_service extends CI_Model{
 		$data = $this->user_model->del($userId);
 		return $data;
 	}
-	public function add($name, $password, $type)
+	public function add($array)
 	{
+		$name = $array['name'];
+		$password = $array['password'];
+		$type = $array['type'];
+
 		$data = $this->user_model->get_user_by_name($name);
 		if( count($data['data']) != 0 )
 			return array(
@@ -38,12 +42,21 @@ class User_service extends CI_Model{
 		$rand_value = rand();
 		$password .= $rand_value;
 		$password = sha1($password);
-		$data = $this->user_model->add($name, $password, $rand_value, $type);
+		$array = array(
+			'name'=>$name,
+			'password'=>$password,
+			'randKeys'=>$rand_value,
+			'type'=>$type
+		);
+		$data = $this->user_model->add($array);
 		return $data;
 	}
 	public function mod_user_type($userId, $type)
 	{
-		$data = $this->user_model->mod_user_type($userId, $type);
+		$array = array(
+			'type'=>$type
+		);
+		$data = $this->user_model->mod_user_type($userId, $array);
 		return $data;
 	}
 	public function mod_user_pwd($userId, $pwd)
@@ -51,16 +64,22 @@ class User_service extends CI_Model{
 		$rand_value = rand();
 		$pwd .= $rand_value;
 		$pwd = sha1($pwd);
-		$data = $this->user_model->mod_user_pwd($userId, $pwd, $rand_value);
+		$array = array(
+			'password'=>$pwd,
+			'randKeys'=>$rand_value
+		);
+		$data = $this->user_model->mod_user_pwd($userId, $array);
 		return $data;
 	}
-	public function mod_old_pwd($userId, $old, $new)
+	public function mod_old_pwd($userId, $array)
 	{
 		$data = $this->user_model->get_user_by_id($userId);
 		$tmp = $data['data'];
 		if( count($data['data']) != 0 )
 		{
 			$rand_value = $tmp[0]['randKeys'];
+			$old = $array['old'];
+			$new = $array['new'];
 			$old .= $rand_value;
 			$old = sha1($old);
 			if( $old != $tmp[0]['password'] )
@@ -72,7 +91,11 @@ class User_service extends CI_Model{
 			$rand_value = rand();
 			$new .= $rand_value;
 			$new = sha1($new);
-			$data = $this->user_model->mod_user_pwd($userId, $new, $rand_value);
+			$array = array(
+				'password'=>$new,
+				'randKeys'=>$rand_value
+			);
+			$data = $this->user_model->mod_user_pwd($userId, $array);
 			return $data;
 		}
 		return array(
@@ -84,15 +107,6 @@ class User_service extends CI_Model{
 	public function search($where, $limit)
 	{
 		$data = $this->user_model->search($where, $limit);
-		$num = count($data['data']);
-		$result = array(
-			'count'=>$num,
-			'data'=>$data['data']
-		);
-		return array(
-			'code'=>0,
-			'msg'=>'',
-			'data'=>$result
-		);
+		return $data;
 	}
 } 

@@ -40,21 +40,22 @@ class User_model extends CI_Model{
 			$this->db->like($key, $value);
 		}
 
-		$size = $limit['pageSize'];
-		$limit_size = $num - $limit['pageIndex'];
-		if( $size != '')
+		if( isset($limit['pageSize']) && isset($limit['pageIndex']))
 		{
-			if( $limit_size <= $size )
-				$size = $limit_size;
-
+			$size = $limit['pageSize'];
+			$limit_size = $num - $limit['pageIndex'];
 			$this->db->limit($size, $limit['pageIndex']);
 		}
 		$query = $this->db->get('t_user');
 		$data = $query->result_array();
+		$result = array(
+			'count'=>$num,
+			'data'=>$data
+		);
 		return array(
 				'code'=>0,
 				'msg'=>'',
-				'data'=>$data
+				'data'=>$result
 			    );
 	}
 	public function del($userId)
@@ -67,14 +68,8 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function add($name, $password, $rand_value, $type)
+	public function add($data)
 	{
-		$data = array(
-				'name'=>$name,
-				'password'=>$password,
-				'randKeys' =>$rand_value, 
-				'type'=>$type
-			     );
 		$this->db->insert('t_user', $data);
 		return array(
 				'code'=>0,
@@ -82,14 +77,8 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod($userId, $name, $password, $rand_value, $type)
+	public function mod($userId, $data)
 	{
-		$data = array(
-				'name'=>$name,
-				'password'=>$password,
-				'randKeys'=>$rand_value,
-				'type'=>$type
-			     );
 		$this->db->where('userId', $userId);
 		$this->db->update('t_user', $data);
 		return array(
@@ -98,11 +87,8 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod_user_type($userId, $type)
+	public function mod_user_type($userId,$data)
 	{
-		$data = array(
-				'type'=>$type
-			     );
 		$this->db->where('userId', $userId);
 		$this->db->update('t_user', $data);
 		return array(
@@ -111,12 +97,8 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod_user_pwd($userId, $pwd, $rand_value)
+	public function mod_user_pwd($userId, $data)
 	{
-		$data = array(
-				'password'=>$pwd,
-				'randKeys'=>$rand_value
-			     );
 		$this->db->where('userId', $userId);
 		$this->db->update('t_user', $data);
 		return array(
