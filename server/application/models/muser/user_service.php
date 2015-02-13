@@ -4,10 +4,11 @@ class User_service extends CI_Model{
 	{
 		parent::__construct();
 		$this->load->model('muser/user_model', 'user_model');
+		$this->load->model('maccount/account_model', 'account_model');
 	}
-	public function get_user_by_id($userId)
+	public function get_user_by_id($where)
 	{
-		$data = $this->user_model->get_user_by_id($userId);
+		$data = $this->user_model->get_user_by_id($where);
 		$num = count($data['data']);
 		if( $num == 0 )
 			return array(
@@ -21,9 +22,10 @@ class User_service extends CI_Model{
 				'data'=>$data['data'][0]
 			    );
 	}
-	public function del($userId)
+	public function del($where)
 	{
-		$data = $this->user_model->del($userId);
+		$data = $this->user_model->del($where);
+		$result = $this->account_model->del($where);
 		return $data;
 	}
 	public function add($array)
@@ -31,8 +33,10 @@ class User_service extends CI_Model{
 		$name = $array['name'];
 		$password = $array['password'];
 		$type = $array['type'];
-
-		$data = $this->user_model->get_user_by_name($name);
+		$names = array(
+			'name'=>$name
+		);
+		$data = $this->user_model->get_user_by_name($names);
 		if( count($data['data']) != 0 )
 			return array(
 					'code'=>1,
@@ -51,16 +55,14 @@ class User_service extends CI_Model{
 		$data = $this->user_model->add($array);
 		return $data;
 	}
-	public function mod_user_type($userId, $type)
+	public function mod_user_type($where, $data)
 	{
-		$array = array(
-			'type'=>$type
-		);
-		$data = $this->user_model->mod_user_type($userId, $array);
-		return $data;
+		$result = $this->user_model->mod_user_type($where, $data);
+		return $result;
 	}
-	public function mod_user_pwd($userId, $pwd)
+	public function mod_user_pwd($where, $data)
 	{
+		$pwd = $data['password'];
 		$rand_value = uniqid();
 		$pwd .= $rand_value;
 		$pwd = sha1($pwd);
@@ -68,14 +70,14 @@ class User_service extends CI_Model{
 			'password'=>$pwd,
 			'randKeys'=>$rand_value
 		);
-		$data = $this->user_model->mod_user_pwd($userId, $array);
+		$data = $this->user_model->mod_user_pwd($where, $array);
 		return $data;
 	}
-	public function mod_old_pwd($userId, $array)
+	public function mod_old_pwd($where, $array)
 	{
-		$data = $this->user_model->get_user_by_id($userId);
-		$tmp = $data['data'];
-		if( count($data['data']) != 0 )
+		$result = $this->user_model->get_user_by_id($where);
+		$tmp = $result['data'];
+		if( count($result['data']) != 0 )
 		{
 			$rand_value = $tmp[0]['randKeys'];
 			$old = $array['old'];
@@ -95,8 +97,8 @@ class User_service extends CI_Model{
 				'password'=>$new,
 				'randKeys'=>$rand_value
 			);
-			$data = $this->user_model->mod_user_pwd($userId, $array);
-			return $data;
+			$result= $this->user_model->mod_user_pwd($where, $array);
+			return $result;
 		}
 		return array(
 				'code'=>1,

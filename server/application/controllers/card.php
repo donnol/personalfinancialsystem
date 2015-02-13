@@ -23,15 +23,23 @@ class Card extends CI_Controller{
 		$pageSize = $this->input->get('pageSize');
 
 		$where = array(
+			'userId'=>$userId,
 			'name'=>$name,
 			'remark'=>$remark
 		);
-		$limit = array(
-			'pageIndex'=>$pageIndex,
-			'pageSize'=>$pageSize
-		);
+		if( $pageIndex == FALSE OR $pageSize == FALSE )
+		{
+			$limit = array();
+		}
+		else
+		{
+			$limit = array(
+				'pageIndex'=>$pageIndex,
+				'pageSize'=>$pageSize
+			);
+		}
 
-		$data['json'] = $this->card_service->search($userId, $where, $limit);
+		$data['json'] = $this->card_service->search($where, $limit);
 		$this->load->view('json', $data);
 	}
 	public function get()
@@ -46,7 +54,11 @@ class Card extends CI_Controller{
 		$userId = $result['data'];
 
 		$cardId = $this->input->get('cardId');
-		$data['json'] = $this->card_service->get_card_by_id($userId, $cardId);
+		$where = array(
+			'userId'=>$userId,
+			'cardId'=>$cardId
+		);
+		$data['json'] = $this->card_service->get_card_by_id($where);
 		$this->load->view('json', $data);
 	}
 	public function del()
@@ -61,7 +73,10 @@ class Card extends CI_Controller{
 		$userId = $result['data'];
 
 		$cardId = $this->input->post('cardId');
-		$data['json'] = $this->card_service->del($userId, $cardId);
+		$where = array(
+			'cardId'=>$cardId
+		);
+		$data['json'] = $this->card_service->del($where);
 		$this->load->view('json', $data);
 	}
 	public function add()
@@ -80,7 +95,15 @@ class Card extends CI_Controller{
 		$money = $this->input->post('money');
 		$remark = $this->input->post('remark');
 		
-		$data['json'] = $this->card_service->add($userId, $name, $bank, $card, $money, $remark);
+		$add_data = array(
+			'userId'=>$userId,
+			'name'=>$name,
+			'bank'=>$bank,
+			'card'=>$card,
+			'money'=>$money,
+			'remark'=>$remark
+		);
+		$data['json'] = $this->card_service->add($add_data);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -100,7 +123,18 @@ class Card extends CI_Controller{
 		$money = $this->input->post('money');
 		$remark = $this->input->post('remark');
 
-		$data['json'] = $this->card_service->mod($userId, $cardId, $name, $bank, $card, $money, $remark);
+		$where = array(
+			'userId'=>$userId,
+			'cardId'=>$cardId
+		);
+		$mod_data = array(
+			'name'=>$name,
+			'bank'=>$bank,
+			'card'=>$card,
+			'money'=>$money,
+			'remark'=>$remark
+		);
+		$data['json'] = $this->card_service->mod($where, $mod_data);
 		$this->load->view('json', $data);
 	}
 }

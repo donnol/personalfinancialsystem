@@ -4,24 +4,20 @@ class Card_service extends CI_Model{
 	{
 		parent::__construct();
 		$this->load->model('mcard/card_model', 'card_model');
+		$this->load->model('maccount/account_model', 'account_model');
 	}
-	public function search($userId, $where, $limit)
+	public function search($where, $limit)
 	{
-		$data = $this->card_model->search($userId, $where, $limit);
-		$num = count($data['data']);
-		$result = array(
-			'count'=>$num,
-			'data'=>$data['data']
-		);
+		$data = $this->card_model->search($where, $limit);
 		return array(
 			'code'=>0,
 			'msg'=>'',
-			'data'=>$result
+			'data'=>$data['data']
 		);
 	}
-	public function get_card_by_id($userId, $cardId)
+	public function get_card_by_id($where)
 	{
-		$data = $this->card_model->get_card_by_id($userId, $cardId);
+		$data = $this->card_model->get_card_by_id($where);
 		$num = count($data['data']);
 		if( $num == 0 )
 			return array(
@@ -35,36 +31,22 @@ class Card_service extends CI_Model{
 			'data'=>$data['data'][0]
 		);
 	}
-	public function del($userId, $cardId)
+	public function del($where)
 	{
-		$data = $this->card_model->del($userId, $cardId);
+		$data = $this->card_model->del($where);
+		$card = array(
+			'cardId'=>'0'
+		);
+		$this->account_model->mod($where, $card);
 		return $data;
 	}
-	public function add($userId, $name, $bank, $card, $money, $remark)
+	public function add($data)
 	{
-		$data = $this->card_model->get_card_by_name($userId, $name);
-		$num = count($data['data']);
-		if( $num != 0 )
-			return array(
-				'code'=>1,
-				'msg'=>'name is already exist.',
-				'data'=>''
-			);
-
-		$data = $this->card_model->add($userId, $name, $bank, $card, $money, $remark);
-		return $data;
-	}
-	public function mod($userId, $cardId, $name, $bank, $card, $money, $remark)
-	{
-		$result = $this->card_model->get_card_by_id($userId, $cardId);
-		$tmp = $result['data'];
-		if( $tmp[0]['name'] == $name )
-		{	
-			$data = $this->card_model->mod($userId, $cardId, $name, $bank, $card, $money, $remark);
-			return $data;
-		}
-
-		$result = $this->card_model->get_card_by_name($userId, $name);
+		$array = array(
+			'userId'=>$data['userId'],
+			'name'=>$data['name']
+		);
+		$result = $this->card_model->get_card_by_name($array);
 		$num = count($result['data']);
 		if( $num != 0 )
 			return array(
@@ -73,7 +55,34 @@ class Card_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->card_model->mod($userId, $cardId, $name, $bank, $card, $money, $remark);
-		return $data;
+		$result = $this->card_model->add($data);
+		return $result;
+	}
+	public function mod($where, $data )
+	{
+		
+		$result = $this->card_model->get_card_by_id( $where);
+		$tmp = $result['data'];
+		if( $tmp[0]['name'] == $data['name'] )
+		{	
+			$data = $this->card_model->mod($where, $data);
+			return $data;
+		}
+
+		$array = array(
+			'userId'=>$where['userId'],
+			'name'=>$data['name']
+		);
+		$result = $this->card_model->get_card_by_name($array);
+		$num = count($result['data']);
+		if( $num != 0 )
+			return array(
+				'code'=>1,
+				'msg'=>'name is already exist.',
+				'data'=>''
+			);
+
+		$result = $this->card_model->mod($where, $data);
+		return $result;
 	}
 }

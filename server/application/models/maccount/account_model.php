@@ -7,17 +7,6 @@ class Account_model extends CI_Model{
 	}
 	public function search($where, $limit)
 	{
-		/*foreach($where as $key=>$value)
-		{
-			if($key == 'userId' OR $key == 'categoryId' OR $key == 'cardId' )
-			{
-				$this->db->where($key, $value);
-			}
-			else
-			{
-				$this->db->like($key, $value);
-			}
-		}*/
 		$num = $this->db->count_all('t_account');
 
 		foreach($where as $key=>$value)
@@ -40,11 +29,25 @@ class Account_model extends CI_Model{
 			}
 		}
 
-		if(isset($limit['pageSize']) && isset($limit['pageIndex']))
+		if(isset($limit['pageSize']) && isset($limit['pageIndex']) && $limit['pageSize'] != FALSE )
+			$this->db->limit($limit['pageSize'], $limit['pageIndex']);
+		$query = $this->db->get('t_account');
+		$data = $query->result_array();
+		$result = array(
+			'count'=>$num,
+			'data'=>$data
+		);
+		return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$result
+			    );
+	}
+	public function get_account_by_id($where)
+	{
+		foreach($where as $key=>$value)
 		{
-			$size = $limit['pageSize'];
-			$index = $limit['pageIndex'];
-			$this->db->limit($size, $index);
+			$this->db->where($key, $value);
 		}
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
@@ -54,10 +57,12 @@ class Account_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function get_account_by_id($userId, $accountId)
+	public function get_account_by_name($where)
 	{
-		$this->db->where('userId', $userId);
-		$this->db->where('accountId', $accountId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
 		return array(
@@ -66,22 +71,12 @@ class Account_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function get_account_by_name($userId, $name)
+	public function del($where)
 	{
-		$this->db->where('userId', $userId);
-		$this->db->where('name', $name);
-		$query = $this->db->get('t_account');
-		$data = $query->result_array();
-		return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			    );
-	}
-	public function del($userId, $accountId)
-	{
-		$this->db->where('userId', $userId);
-		$this->db->where('accountId', $accountId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->delete('t_account');
 		return array(
 				'code'=>0,
@@ -89,17 +84,8 @@ class Account_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function add($userId, $name, $money, $type, $categoryId, $cardId, $remark)
+	public function add($data)
 	{
-		$data = array(
-				'userId'=>$userId,
-				'name'=>$name,
-				'money'=>$money,
-				'type'=>$type,
-				'categoryId'=>$categoryId,
-				'cardId'=>$cardId,
-				'remark'=>$remark
-			     );
 		$this->db->insert('t_account',$data);
 		return array(
 				'code'=>0,
@@ -107,25 +93,6 @@ class Account_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	/*public function mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark)
-	{
-		$data = array(
-				'name'=>$name,
-				'money'=>$money,
-				'type'=>$type,
-				'categoryId'=>$categoryId,
-				'cardId'=>$cardId,
-				'remark'=>$remark
-			     );
-		$this->db->where('userId', $userId);
-		$this->db->where('accountId', $accountId);
-		$this->db->update('t_account', $data);
-		return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>''
-			    );
-	}*/
 	public function mod($where, $data)
 	{
 		foreach($where as $key=>$value)

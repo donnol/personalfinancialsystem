@@ -5,9 +5,12 @@ class User_model extends CI_Model{
 		parent::__construct();
 		$this->load->database();
 	}
-	public function get_user_by_id($userId)
+	public function get_user_by_id($where)
 	{
-		$this->db->where('userId', $userId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_user');
 		$data = $query->result_array();
 		return array(
@@ -16,9 +19,12 @@ class User_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function get_user_by_name($name)
+	public function get_user_by_name($where)
 	{
-		$this->db->where('name', $name);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_user');
 		$data = $query->result_array();
 		return array(
@@ -29,22 +35,21 @@ class User_model extends CI_Model{
 	}
 	public function search($where, $limit)
 	{
-		foreach($where as $key=>$value)
-		{
-			$this->db->like($key, $value);
-		}
 		$num = $this->db->count_all('t_user');
 
 		foreach($where as $key=>$value)
 		{
-			$this->db->like($key, $value);
+			if( $key == 'userId' && $value != '' )
+			{
+				$this->db->where($key, $value);
+			}
+			else{
+				$this->db->like($key, $value);
+			}
 		}
 
-		if( isset($limit['pageSize']) && isset($limit['pageIndex']))
-		{
-			$size = $limit['pageSize'];
-			$this->db->limit($size, $limit['pageIndex']);
-		}
+		if( isset($limit['pageSize']) && isset($limit['pageIndex']) && $limit['pageSize'] != FALSE )
+			$this->db->limit($limit['pageSize'], $limit['pageIndex']);
 		$query = $this->db->get('t_user');
 		$data = $query->result_array();
 		$result = array(
@@ -57,9 +62,12 @@ class User_model extends CI_Model{
 				'data'=>$result
 			    );
 	}
-	public function del($userId)
+	public function del($where)
 	{
-		$this->db->where('userId', $userId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->delete('t_user');
 		return array(
 				'code'=>0,
@@ -76,9 +84,12 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod($userId, $data)
+	public function mod($where, $data)
 	{
-		$this->db->where('userId', $userId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->update('t_user', $data);
 		return array(
 				'code'=>0,
@@ -86,9 +97,12 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod_user_type($userId,$data)
+	public function mod_user_type($where,$data)
 	{
-		$this->db->where('userId', $userId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->update('t_user', $data);
 		return array(
 				'code'=>0,
@@ -96,9 +110,12 @@ class User_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod_user_pwd($userId, $data)
+	public function mod_user_pwd($where, $data)
 	{
-		$this->db->where('userId', $userId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->update('t_user', $data);
 		return array(
 				'code'=>0,

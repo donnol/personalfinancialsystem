@@ -5,68 +5,84 @@
 			parent::__construct();
 			$this->load->database();
 		}
-		public function get_category_by_name($userId, $name)
+		public function get_category_by_name($where)
 		{
-			$this->db->where('userId', $userId);
-			$this->db->where('name', $name);
-			$query = $this->db->get('t_category');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function get_category_by_id($userId, $categoryId)
-		{
-			$this->db->where('userId', $userId);
-			$this->db->where('categoryId', $categoryId);
-			$query = $this->db->get('t_category');
-			$data = $query->result_array();
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			);
-		}
-		public function search($userId, $where, $limit)
-		{
-			$this->db->where('userId', $userId);
 			foreach($where as $key=>$value)
 			{
-				$this->db->like($key, $value);
+				$this->db->where($key, $value);
 			}
+			$query = $this->db->get('t_category');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function get_category_by_id($where)
+		{
+			foreach($where as $key=>$value)
+			{
+				$this->db->where($key, $value);
+			}
+			$query = $this->db->get('t_category');
+			$data = $query->result_array();
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			);
+		}
+		public function search( $where, $limit)
+		{
 			$num = $this->db->count_all('t_category');
 
-			$this->db->where('userId', $userId);
 			foreach($where as $key=>$value)
 			{
-				$this->db->like($key, $value);
+				if( $key == 'userId' && $value != '' )
+				{
+					$this->db->where($key, $value);
+					continue;
+				}
+				elseif( $key == 'categoryId' && $value != '')
+				{
+					$this->db->where($key, $value);
+					continue;
+				}
+				elseif( $value != '' )
+				{
+					$this->db->like($key, $value);
+					continue;
+				}
+				else
+				{
+					continue;
+				}
 			}
 			
-			$index = $limit['pageIndex'];
-			$size = $limit['pageSize'];
-			
-			if( $size != '' )
+			if( isset($limit['pageIndex']) && isset($limit['pageSize']))
 			{
-			$limit_size = $num - $index;
-			if( $limit_size <= $size )
-				$size = $limit_size;
-
-			$this->db->limit($size, $index);
+				if( $limit['pageSize'] != FALSE )
+					$this->db->limit($limit['pageSize'], $limit['pageIndex']);
 			}
 			$query = $this->db->get('t_category');
 			$data = $query->result_array();
+			$result = array(
+				'count'=>$num,
+				'data'=>$data
+			);
 			return array(
 				'code'=>0,
 				'msg'=>'',
-				'data'=>$data
+				'data'=>$result
 			);
 		}
-		public function del($userId, $categoryId)
+		public function del($where)
 		{
-			$this->db->where('userId', $userId);
-			$this->db->where('categoryId', $categoryId);
+			foreach($where as $key=>$value)
+			{
+				$this->db->where($key, $value);
+			}
 			$this->db->delete('t_category');
 			return array(
 				'code'=>0,
@@ -74,13 +90,8 @@
 				'data'=>''
 			);
 		}
-		public function add($userId, $name, $remark)
+		public function add($data)
 		{
-			$data = array(
-				'userId'=>$userId,
-				'name'=>$name,
-				'remark'=>$remark
-			);
 			$this->db->insert('t_category', $data);
 			return array(
 				'code'=>0,
@@ -88,14 +99,12 @@
 				'data'=>''
 			);
 		}
-		public function mod($categoryId, $userId, $name, $remark)
+		public function mod($where, $data)
 		{
-			$data = array(
-				'name'=>$name,
-				'remark'=>$remark
-			);
-			$this->db->where('categoryId', $categoryId);
-			$this->db->where('userId', $userId);
+			foreach($where as $key=>$value)
+			{
+				$this->db->where($key, $value);
+			}
 			$this->db->update('t_category', $data);
 			return array(
 				'code'=>0,

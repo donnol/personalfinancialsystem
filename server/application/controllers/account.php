@@ -35,10 +35,17 @@ class Account extends CI_Controller{
 			'name'=>$name,
 			'remark'=>$remark
 		);
-		$limit = array(
-			'pageIndex'=>$pageIndex,
-			'pageSize'=>$pageSize
-		);
+		if( $pageIndex == FALSE OR $pageSize == FALSE )
+		{
+			$limit = array();
+		}
+		else
+		{
+			$limit = array(
+					'pageIndex'=>$pageIndex,
+					'pageSize'=>$pageSize
+				      );
+		}
 
 		$data['json'] = $this->account_service->search($where, $limit);
 		$this->load->view('json', $data);
@@ -54,8 +61,12 @@ class Account extends CI_Controller{
 		}
 		$userId = $result['data'];
 		$accountId = $this->input->get('accountId');
+		$where = array(
+			'userId'=>$userId,
+			'accountId'=>$accountId
+		);
 
-		$data['json'] = $this->account_service->get_account_by_id($userId, $accountId);
+		$data['json'] = $this->account_service->get_account_by_id($where);
 		$this->load->view('json', $data);
 	}
 	public function del()
@@ -69,8 +80,11 @@ class Account extends CI_Controller{
 		}
 		$userId = $result['data'];
 		$accountId = $this->input->post('accountId');
+		$where = array(
+			'accountId'=>$accountId,
+		);
 
-		$data['json'] = $this->account_service->del($userId, $accountId);
+		$data['json'] = $this->account_service->del($accountId);
 		$this->load->view('json', $data);
 	}
 	public function add()
@@ -90,8 +104,16 @@ class Account extends CI_Controller{
 		$type = $this->input->post('type');
 		$categoryId = $this->input->post('categoryId');
 		$cardId = $this->input->post('cardId');
+		$add_data = array(
+			'userId'=>$userId,
+			'name'=>$name,
+			'money'=>$money,
+			'type'=>$type,
+			'categoryId'=>$categoryId,
+			'cardId'=>$cardId
+		);
 
-		$data['json'] = $this->account_service->add($userId, $name, $money, $type, $categoryId, $cardId, $remark);
+		$data['json'] = $this->account_service->add($add_data);
 		$this->load->view('json', $data);
 	}
 	public function mod()

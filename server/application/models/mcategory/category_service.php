@@ -6,44 +6,40 @@ class Category_service extends CI_Model{
 		$this->load->model('mcategory/category_model', 'category_model');
 		$this->load->model('maccount/account_model', 'account_model');
 	}
-	public function search($userId, $where, $limit)
+	public function search($where, $limit)
 	{
-		$data = $this->category_model->search($userId, $where, $limit);
-		$num = count($data['data']);
-		$result = array(
-			'count'=>$num,
-			'data'=>$data['data']
-		);
+		$data = $this->category_model->search($where, $limit);
 		return array(
 			'code'=>0,
 			'msg'=>'',
-			'data'=>$result
+			'data'=>$data['data']
 		);
 	}
-	public function get_category_by_id($userId, $categoryId)
+	public function get_category_by_id($where)
 	{
-		$data = $this->category_model->get_category_by_id($userId, $categoryId);
+		$data = $this->category_model->get_category_by_id($where);
 		return array(
 			'code'=>0,
 			'msg'=>'',
 			'data'=>$data['data'][0]
 		);
 	}
-	public function del($userId, $categoryId)
+	public function del($where)
 	{
-		$array = array(
-			'categoryId'=>$categoryId
-		);
-		$data = $this->category_model->del($userId, $categoryId);
+		$data = $this->category_model->del($where);
 		$category = array(
 			'categoryId'=>'0'
 		);
-		$this->account_model->mod($array, $category);
+		$this->account_model->mod($where, $category);
 		return $data;
 	}
-	public function add($userId,$name, $remark)
+	public function add($data)
 	{
-		$result = $this->category_model->get_category_by_name($userId, $name);
+		$where = array(
+			'userId'=>$data['userId'],
+			'name'=>$data['name']
+		);
+		$result = $this->category_model->get_category_by_name($where);
 		$num = count($result['data']);
 		if( $num != 0 )
 			return array(
@@ -52,24 +48,28 @@ class Category_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->category_model->add($userId, $name, $remark);
-		return $data;
+		$reault = $this->category_model->add($data);
+		return $result;
 	}
-	public function mod($categoryId, $userId, $name, $remark)
+	public function mod($where, $data)
 	{
-		$result = $this->category_model->get_category_by_id($userId, $categoryId);
+		$ids = array(
+			'userId'=>$where['userId'],
+			'categoryId'=>$where['categoryId']
+		);
+		$result = $this->category_model->get_category_by_id($ids);
 		$tmp = $result['data'];
-		if( $tmp[0]['name'] == $name )
+		if( $tmp[0]['name'] == $data['name'] )
 		{
-			$data = $this->category_model->mod($categoryId, $userId, $name, $remark);
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>''
-			);
+			$result = $this->category_model->mod($where, $data);
+			return $result;
 		}
 			
-		$result = $this->category_model->get_category_by_name($userId, $name);
+		$names = array(
+			'userId'=>$where['userId'],
+			'name'=>$data['name']
+		);
+		$result = $this->category_model->get_category_by_name($names);
 		$num = count($result['data']);
 		if( $num != 0 )
 			return array(
@@ -78,7 +78,7 @@ class Category_service extends CI_Model{
 				'data'=>''
 			);
 
-		$data = $this->category_model->mod($categoryId, $userId, $name, $remark);
-		return $data;
+		$result = $this->category_model->mod($where, $data);
+		return $result;
 	}
 }

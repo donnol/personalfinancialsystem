@@ -5,10 +5,12 @@ class Card_model extends CI_Model{
 		parent::__construct();
 		$this->load->database();
 	}
-	public function get_card_by_name($userId, $name)
+	public function get_card_by_name($where)
 	{
-		$this->db->where('userId', $userId);
-		$this->db->where('name', $name);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_card');
 		$data = $query->result_array();
 		return array(
@@ -17,10 +19,12 @@ class Card_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function get_card_by_id($userId, $cardId)
+	public function get_card_by_id($where)
 	{
-		$this->db->where('userId', $userId);
-		$this->db->where('cardId', $cardId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_card');
 		$data = $query->result_array();
 		return array(
@@ -30,44 +34,58 @@ class Card_model extends CI_Model{
 			    );
 	}
 	/* search for the data with like statement */
-	public function search($userId, $where, $limit)
+	public function search( $where, $limit)
 	{
-		$this->db->where('userId', $userId);
-		foreach( $where as $key=>$value)
-		{
-			$this->db->like($key, $value);
-		}
 		$num = $this->db->count_all('t_card');
-
-		$this->db->where('userId', $userId);
 		foreach( $where as $key=>$value)
 		{
-			$this->db->like($key, $value);
+			if( $key == 'userId' && $value != '' )
+			{
+				$this->db->where($key, $value);
+				continue;
+			}
+			elseif( $key == 'cardId' && $value != '' )
+			{
+				$this->db->where($key, $value);
+				continue;
+			}
+			elseif( $value != '' )
+			{
+				$this->db->like($key, $value);
+				continue;
+			}
+			else
+			{
+				continue;
+			}
 		}
 
-		$size = $limit['pageSize'];
-		$offset = $limit['pageIndex'];
-		if( $size != '')
+		if( isset($limit['pageIndex']) && isset($limit['pageSize']))
 		{
-			$limit_size = $num - $limit['pageIndex'];
-			if( $limit_size <= $size )
-				$size = $limit_size;
-
-			$this->db->limit($size, $offset);
+			$size = $limit['pageSize'];
+			$offset = $limit['pageIndex'];
+			if( $size != FALSE )
+				$this->db->limit($size, $offset);
 		}
 		$query = $this->db->get('t_card');
 		$data = $query->result_array();
+		$result = array(
+			'count'=>$num,
+			'data'=>$data
+		);
 		return array(
 				'code'=>0,
 				'msg'=>'',
-				'data'=>$data
+				'data'=>$result
 			    );
 
 	}
-	public function del($userId, $cardId)
+	public function del($where)
 	{
-		$this->db->where('userId', $userId);
-		$this->db->where('cardId', $cardId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->delete('t_card');
 		return array(
 				'code'=>0,
@@ -75,16 +93,8 @@ class Card_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function add($userId, $name, $bank, $card, $money, $remark)
+	public function add($data)
 	{
-		$data = array(
-				'userId'=>$userId,
-				'name'=>$name,
-				'bank'=>$bank,
-				'card'=>$card,
-				'money'=>$money,
-				'remark'=>$remark
-			     );
 		$this->db->insert('t_card', $data);
 		return array(
 				'code'=>0,
@@ -92,17 +102,12 @@ class Card_model extends CI_Model{
 				'data'=>''
 			    );
 	}
-	public function mod($userId, $cardId, $name, $bank, $card, $money, $remark)
+	public function mod($where, $data)
 	{
-		$data = array(
-				'name'=>$name,
-				'bank'=>$bank,
-				'card'=>$card,
-				'money'=>$money,
-				'remark'=>$remark
-			     );
-		$this->db->where('userId', $userId);
-		$this->db->where('cardId', $cardId);
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->update('t_card', $data);
 		return array(
 				'code'=>0,

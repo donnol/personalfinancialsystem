@@ -8,20 +8,15 @@ class Account_service extends CI_Model{
 	public function search($where, $limit)
 	{
 		$data = $this->account_model->search($where, $limit);
-		$num = count($data['data']);
-		$result = array(
-			'count'=>$num,
-			'data'=>$data['data']
-		);
 		return array(
-			'code'=>0,
-			'msg'=>'',
-			'data'=>$result
-		);
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data['data']
+			    );
 	}
-	public function get_account_by_id($userId, $accountId)
+	public function get_account_by_id($where)
 	{
-		$data = $this->account_model->get_account_by_id($userId, $accountId);
+		$data = $this->account_model->get_account_by_id($where);
 		$num = count($data['data']);
 		if( $num == 0 )
 			return array(
@@ -30,75 +25,58 @@ class Account_service extends CI_Model{
 					'data'=>''
 				    );
 		return array(
-			'code'=>0,
-			'msg'=>'',
-			'data'=>$data['data'][0]
-		);
-	}
-	public function del($userId, $accountId)
-	{
-		$this->account_model->del($userId, $accountId);
-		return array(
 				'code'=>0,
 				'msg'=>'',
-				'data'=>''
+				'data'=>$data['data'][0]
 			    );
 	}
-	public function add($userId, $name, $money, $type, $categoryId, $cardId, $remark)
+	public function del($where)
 	{
-		$data = $this->account_model->get_account_by_name($userId, $name);
-		$num = count($data['data']);
+		$result = $this->account_model->del($where);
+		return $result;
+	}
+	public function add($data)
+	{
+		$names = array(
+				'userId'=>$data['userId'],
+				'name'=>$data['name']
+			      );
+		$result = $this->account_model->get_account_by_name($names);
+		$num = count($result['data']);
 		if( $num != 0 )
 			return array(
 					'code'=>1,
 					'msg'=>'name is already exist',
 					'data'=>''
 				    );
-		$data = $this->account_model->add($userId, $name, $money, $type, $categoryId, $cardId, $remark);
-		return $data;
+		$result = $this->account_model->add($data);
+		return $result;
 	}
-	/*public function mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark)
-	{
-		$data = $this->account_model->get_account_by_id($userId, $accountId);
-		$tmp = $data['data'];
-		if( $tmp[0]['name'] == $name )
-			{
-			$data = $this->account_model->mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark);
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>''
-			);
-			}
-		$data = $this->account_model->get_account_by_name($userId, $name);
-		$num = count($data['data']);
-		if( $num != 0 )
-			return array(
-				'code'=>1,
-				'msg'=>'name is already exist.',
-				'data'=>''
-			);
-		
-		$data = $this->account_model->mod($userId, $accountId, $name, $money, $type, $categoryId, $cardId, $remark);
-		return $data;
-	}*/
 	public function mod($where, $data)
 	{
-		$result = $this->account_model->get_account_by_id($where['userId'], $where['accountId']);
+		$ids = array(
+				'userId'=>$where['userId'],
+				'accountId'=>$where['accountId']
+			    );
+		$result = $this->account_model->get_account_by_id($ids);
 		$accounts = $result['data'];
-		if( $accounts[0]['name'] == $name )
+		if( $accounts[0]['name'] == $data['name'] )
 		{
 			$result = $this->account_model->mod($where, $data);
 			return $result;
 		}
-		$result = $this->account_model->get_account_by_name($where['userId'], $data['name']);
+		$names = array(
+				'userId'=>$where['userId'],
+				'name'=>$data['name']
+			      );
+		$result = $this->account_model->get_account_by_name($names);
 		$num = count($result['data']);
 		if( $num != 0 )
 			return array(
-				'code'=>1,
-				'msg'=>'name is already exist.',
-				'data'=>''
-			);
+					'code'=>1,
+					'msg'=>'name is already exist.',
+					'data'=>''
+				    );
 
 		$result = $this->account_model->mod($where, $data);
 		return $result;

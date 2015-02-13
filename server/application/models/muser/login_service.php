@@ -8,7 +8,10 @@ class Login_service extends CI_Model{
 	}
 	public function checkin($name, $pwd)
 	{
-		$data = $this->user_model->get_user_by_name($name);
+		$names = array(
+			'name'=>$name
+		);
+		$data = $this->user_model->get_user_by_name($names);
 		$tmp = $data['data'];
 		if( count($tmp) != 0)
 		{

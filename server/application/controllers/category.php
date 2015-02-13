@@ -24,15 +24,23 @@ class Category extends CI_Controller{
 		$pageSize = $this->input->get('pageSize');
 
 		$where = array(
+			'userId'=>$userId,
 			'name'=>$name,
 			'remark'=>$remark
 		);
-		$limit = array(
-			'pageIndex'=>$pageIndex,
-			'pageSize'=>$pageSize
-		);
+		if( $pageIndex == FALSE OR $pageSize == FALSE )
+		{
+			$limit = array();
+		}
+		else
+		{
+			$limit = array(
+					'pageIndex'=>$pageIndex,
+					'pageSize'=>$pageSize
+				      );
+		}
 
-		$data['json'] = $this->category_service->search($userId, $where, $limit);
+		$data['json'] = $this->category_service->search($where, $limit);
 		$this->load->view('json', $data);
 	}
 	public function get()
@@ -46,8 +54,12 @@ class Category extends CI_Controller{
 		}
 		$userId = $result['data'];
 		$categoryId = $this->input->get('categoryId');
+		$where = array(
+			'userId'=>$userId,
+			'categoryId'=>$categoryId
+		);
 
-		$data['json'] = $this->category_service->get_category_by_id($userId, $categoryId);
+		$data['json'] = $this->category_service->get_category_by_id($where);
 		$this->load->view('json', $data);
 	}
 	public function del()
@@ -61,8 +73,11 @@ class Category extends CI_Controller{
 		}
 		$userId = $result['data'];
 		$categoryId = $this->input->post('categoryId');
+		$where = array(
+			'categoryId'=>$categoryId
+		);
 
-		$data['json'] = $this->category_service->del($userId, $categoryId);
+		$data['json'] = $this->category_service->del($where);
 		$this->load->view('json', $data);
 	}
 	public function add()
@@ -78,8 +93,13 @@ class Category extends CI_Controller{
 		$userId = $result['data'];
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
+		$add_data = array(
+			'userId'=>$userId,
+			'name'=>$name,
+			'remark'=>$remark
+		);
 
-		$data['json'] = $this->category_service->add($userId, $name, $remark);
+		$data['json'] = $this->category_service->add($add_data);
 		$this->load->view('json', $data);
 	}
 	public function mod()
@@ -95,8 +115,16 @@ class Category extends CI_Controller{
 		$categoryId = $this->input->post('categoryId');
 		$name = $this->input->post('name');
 		$remark = $this->input->post('remark');
+		$where = array(
+			'userId'=>$userId,
+			'categoryId'=>$categoryId
+		);
+		$mod_data = array(
+			'name'=>$name,
+			'remark'=>$remark
+		);
 
-		$data['json'] = $this->category_service->mod($categoryId, $userId, $name, $remark);
+		$data['json'] = $this->category_service->mod($where, $mod_data);
 		$this->load->view('json', $data);
 	}
 }
