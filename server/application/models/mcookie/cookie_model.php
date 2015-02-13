@@ -26,15 +26,8 @@ class Cookie_model extends CI_Model{
 			'data'=>$data
 		);
 	}
-	public function add_cookie($cookieId, $ipAddress, $userAgent, $lastActivity, $userData)
+	public function add_cookie($data)
 	{
-		$data = array(
-			'session_id'=>$cookieId,
-			'ip_address'=>$ipAddress,
-			'user_agent'=>$userAgent,
-			'last_activity'=>$lastActivity,
-			'user_data'=>$userData
-		);
 		$this->db->insert('ci_sessions', $data);
 		return array(
 			'code'=>0,

@@ -7,9 +7,14 @@
 		}
 		public function checkin()
 		{
-			$name = $this->input->post('name');
-			$pwd = $this->input->post('password');
-			$data['json'] = $this->login_service->checkin($name, $pwd);
+			$where = array();
+
+			if( $name = $this->input->post('name'))
+				$where['name'] = $name;
+			if( $pwd = $this->input->post('password'))
+				$where['pwd'] = $pwd;
+			
+			$data['json'] = $this->login_service->checkin($where);
 			$this->load->view('json', $data);
 		}
 		public function checkout()

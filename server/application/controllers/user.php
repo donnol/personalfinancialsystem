@@ -15,15 +15,21 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$userId = $result['data'];
-		$name = $this->input->get('name');
-		$type = $this->input->get('type');
-		$pageIndex = $this->input->get('pageIndex');
-		$pageSize = $this->input->get('pageSize');
+		$where = array();
+		$limit = array();
+		$ids = array();
 
-		$ids = array(
-			'userId'=>$userId
-		);
+		if( $userId = $result['data'])
+			$ids['userId'] = $userId;
+		if( $name = $this->input->get('name'))
+			$where['name'] = $name;
+		if( $type = $this->input->get('type'))
+			$where['type'] = $type;
+		if( $pageIndex = $this->input->get('pageIndex'))
+			$limit['pageIndex'] = $pageIndex;
+		if( $pageSize = $this->input->get('pageSize'))
+			$limit['pageSize'] = $pageSize;
+
 		$result = $this->user_service->get_user_by_id($ids);
 		if( $result['data']['type'] != '0' )
 		{
@@ -40,21 +46,6 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$where = array(
-				'name'=>$name,
-				'type'=>$type
-			      );
-		if( $pageIndex == FALSE OR $pageSize == FALSE )
-		{
-			$limit = array();
-		}
-		else
-		{
-			$limit = array(
-				'pageIndex'=>$pageIndex,
-				'pageSize'=>$pageSize
-			);
-		}
 
 		$data['json'] = $this->user_service->search($where, $limit);
 		$this->load->view('json', $data);
@@ -68,10 +59,10 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$userId = $this->input->get('userId');
-		$where = array(
-			'userId'=>$userId
-		);
+		$where = array();
+
+		if( $userId = $this->input->get('userId'))
+			$where['userId'] = $userId;
 
 		$data['json'] = $this->user_service->get_user_by_id($where);
 		$this->load->view('json', $data);
@@ -85,10 +76,10 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$adminId = $result['data'];
-		$ids = array(
-			'userId'=>$adminId
-		);
+		if( $adminId = $result['data'])
+			$ids = array(
+					'userId'=>$adminId
+				    );
 		$result = $this->user_service->get_user_by_id($ids);
 		if( $result['data']['type'] != '0' )
 		{
@@ -100,10 +91,10 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$userId = $this->input->post('userId');
-		$where = array(
-			'userId'=>$userId
-		);
+		if( $userId = $this->input->post('userId'))
+			$where = array(
+					'userId'=>$userId
+				      );
 		$result = $this->user_service->get_user_by_id($where);
 		if( $result['data']['type'] == '0' )
 		{
@@ -128,10 +119,10 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$adminId = $result['data'];
-		$ids = array(
-			'userId'=>$adminId
-		);
+		if( $adminId = $result['data'])
+			$ids = array(
+					'userId'=>$adminId
+				    );
 		$result = $this->user_service->get_user_by_id($ids);
 		if( $result['data']['type'] != '0' )
 		{
@@ -144,16 +135,15 @@ class User extends CI_Controller{
 			return;
 		}
 
-		$name = $this->input->post('name');
-		$password = $this->input->post('password');
-		$type = $this->input->post('type');
+		$add_data = array();
+		if( $name = $this->input->post('name'))
+			$add_data['name'] = $name;
+		if( $password = $this->input->post('password'))
+			$add_data['password'] = $password;
+		if( $type = $this->input->post('type'))
+			$add_data['type'] = $type;
 
-		$array = array(
-			'name'=>$name,
-			'password'=>$password,
-			'type'=>$type
-		);
-		$data['json'] = $this->user_service->add($array);
+		$data['json'] = $this->user_service->add($add_data);
 		$this->load->view('json', $data);
 	}
 	public function modType()
@@ -165,10 +155,10 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$adminId = $result['data'];
-		$ids = array(
-			'userId'=>$adminId
-		);
+		if( $adminId = $result['data'])
+			$ids = array(
+					'userId'=>$adminId
+				    );
 		$result = $this->user_service->get_user_by_id($ids);
 		if( $result['data']['type'] != '0' )
 		{
@@ -181,10 +171,10 @@ class User extends CI_Controller{
 			return;
 		}
 
-		$userId = $this->input->post('userId');
-		$ids = array(
-			'userId'=>$userId
-		);
+		if( $userId = $this->input->post('userId'))
+			$ids = array(
+					'userId'=>$userId
+				    );
 		$result = $this->user_service->get_user_by_id($ids);
 		if( $result['data']['type'] == '0' )
 		{
@@ -196,13 +186,14 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$type = $this->input->post('type');
 		$where = array(
 			'userId'=>$userId
 		);
-		$mod_data = array(
-			'type'=>$type	
-		);
+
+		if( $type = $this->input->post('type'))
+			$mod_data = array(
+					'type'=>$type	
+					);
 
 		$data['json'] = $this->user_service->mod_user_type($where, $mod_data);
 		$this->load->view('json', $data);
@@ -216,19 +207,20 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$adminId = $result['data'];
-		$ids = array(
-			'userId'=>$adminId
-		);
+		if( $adminId = $result['data'])
+			$ids = array(
+					'userId'=>$adminId
+				    );
 		$result = $this->user_service->get_user_by_id($ids);
-		$userId = $this->input->post('userId');
-		$password = $this->input->post('password');
-		$where = array(
-			'userId'=>$userId
-		);
-		$mod_data = array(
-			'password'=>$password
-		);
+		if( $userId = $this->input->post('userId'))
+			$where = array(
+					'userId'=>$userId
+				      );
+
+		if( $password = $this->input->post('password'))
+			$mod_data = array(
+					'password'=>$password
+					);
 		if( $result['data']['type'] == '0' )
 		{
 			if($adminId != $userId)
@@ -261,18 +253,17 @@ class User extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$userId = $result['data'];
-		$old = $this->input->post('oldPassword');
-		$new = $this->input->post('newPassword');
-		$where = array(
-			'userId'=>$userId
-		);
-		$array = array(
-			'old'=>$old,
-			'new'=>$new
-		);
+		$where = array();
+		$mod_data = array();
 
-		$data['json'] = $this->user_service->mod_old_pwd($where, $array);
+		if( $userId = $result['data'])
+			$where['userId'] = $userId;
+		if( $old = $this->input->post('oldPassword'))
+			$mod_data['old'] = $old;
+		if( $new = $this->input->post('newPassword'))
+			$mod_data['new'] = $new;
+
+		$data['json'] = $this->user_service->mod_old_pwd($where, $mod_data);
 		$this->load->view('json', $data);
 	}
 }	

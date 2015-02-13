@@ -6,11 +6,12 @@ class Login_service extends CI_Model{
 		$this->load->model('muser/user_model', 'user_model');
 		$this->load->model('mcookie/cookie_model', 'cookie_model');
 	}
-	public function checkin($name, $pwd)
+	public function checkin($array)
 	{
 		$names = array(
-			'name'=>$name
+			'name'=>$array['name']
 		);
+		$pwd = $array['pwd'];
 		$data = $this->user_model->get_user_by_name($names);
 		$tmp = $data['data'];
 		if( count($tmp) != 0)
@@ -32,7 +33,14 @@ class Login_service extends CI_Model{
 			setcookie('user', $value_encode, $t+3600, '/', null);
 			$user_agent = $_SERVER['HTTP_USER_AGENT'];
 			
-			$this->cookie_model->add_cookie($value_encode, $ip, $user_agent, $t, $userId);
+			$add_data = array(
+				'session_id'=>$value_encode,
+				'ip_address'=>$ip,
+				'user_agent'=>$user_agent,
+				'last_activity'=>$t,
+				'user_data'=>$userId
+			);
+			$this->cookie_model->add_cookie($add_data);
 			return array(
 					'code'=>0,
 					'msg'=>'login successfully.',

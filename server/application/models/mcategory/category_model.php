@@ -35,28 +35,37 @@
 		}
 		public function search( $where, $limit)
 		{
-			$num = $this->db->count_all('t_category');
-
 			foreach($where as $key=>$value)
 			{
-				if( $key == 'userId' && $value != '' )
+				if( $key == 'userId' )
 				{
 					$this->db->where($key, $value);
-					continue;
 				}
-				elseif( $key == 'categoryId' && $value != '')
+				elseif( $key == 'categoryId' )
 				{
 					$this->db->where($key, $value);
-					continue;
-				}
-				elseif( $value != '' )
-				{
-					$this->db->like($key, $value);
-					continue;
 				}
 				else
 				{
-					continue;
+					$this->db->like($key, $value);
+				}
+			}
+			$this->db->from('t_category');
+			$num = $this->db->count_all_results();
+
+			foreach($where as $key=>$value)
+			{
+				if( $key == 'userId' )
+				{
+					$this->db->where($key, $value);
+				}
+				elseif( $key == 'categoryId' )
+				{
+					$this->db->where($key, $value);
+				}
+				else
+				{
+					$this->db->like($key, $value);
 				}
 			}
 			

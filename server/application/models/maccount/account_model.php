@@ -7,19 +7,40 @@ class Account_model extends CI_Model{
 	}
 	public function search($where, $limit)
 	{
-		$num = $this->db->count_all('t_account');
+		foreach($where as $key=>$value)
+		{
+			if($key == 'userId')
+			{
+				$this->db->where($key, $value);
+			}
+			elseif($key == 'categoryId' )
+			{
+				$this->db->where($key, $value);
+			}
+			elseif($key == 'cardId' )
+			{
+				$this->db->where($key, $value);
+			}
+			else
+			{
+				$this->db->like($key, $value);
+			}
+
+		}
+		$this->db->from('t_account');
+		$num = $this->db->count_all_results();
 
 		foreach($where as $key=>$value)
 		{
-			if($key == 'userId' && $value != '')
+			if($key == 'userId')
 			{
 				$this->db->where($key, $value);
 			}
-			elseif($key == 'categoryId' && $value !='')
+			elseif($key == 'categoryId' )
 			{
 				$this->db->where($key, $value);
 			}
-			elseif($key == 'cardId' && $value != '')
+			elseif($key == 'cardId' )
 			{
 				$this->db->where($key, $value);
 			}

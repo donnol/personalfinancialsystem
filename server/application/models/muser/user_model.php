@@ -35,7 +35,15 @@ class User_model extends CI_Model{
 	}
 	public function search($where, $limit)
 	{
-		$num = $this->db->count_all('t_user');
+		foreach($where as $key=>$value)
+		{
+			if( $key == 'userId' )
+			{
+				$this->db->where($key, $value);
+			}
+		}
+		$this->db->from('t_user');
+		$num = $this->db->count_all_results();
 
 		foreach($where as $key=>$value)
 		{
@@ -48,7 +56,7 @@ class User_model extends CI_Model{
 			}
 		}
 
-		if( isset($limit['pageSize']) && isset($limit['pageIndex']) && $limit['pageSize'] != FALSE )
+		if( isset($limit['pageSize']) && isset($limit['pageIndex']) )
 			$this->db->limit($limit['pageSize'], $limit['pageIndex']);
 		$query = $this->db->get('t_user');
 		$data = $query->result_array();
