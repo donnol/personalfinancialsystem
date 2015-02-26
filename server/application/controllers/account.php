@@ -138,4 +138,43 @@ class Account extends CI_Controller{
 		$data['json'] = $this->account_service->mod($where, $data);
 		$this->load->view('json', $data);
 	}
+	public function getWeekTypeStatistic()
+	{
+		$result = $this->login_service->islogin();
+		if( $result['code'] != 0 )
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
+
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+
+		$data['json'] = $this->account_service->get_week_type_statistic($where);
+		$this->load->view('json', $data);
+	}
+	public function getWeekDetailTypeStatistic()
+	{
+		$result = $this->login_service->islogin();
+		if( $result['code'] != 0 )
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
+
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+
+		if( ($year = $this->input->post('year')) !== FALSE )
+			$where['year'] = $year;
+		if( ($week = $this->input->post('week')) !== FALSE )
+			$where['week'] = $week;
+		if( ($type = $this->input->post('type')) !== FALSE )
+			$where['type'] = $type;
+
+		$data['json'] = $this->account_service->get_week_detail_type_statistic($where);
+		$this->load->view('json', $data);
+	}
 }

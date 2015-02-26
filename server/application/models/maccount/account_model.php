@@ -64,6 +64,21 @@ class Account_model extends CI_Model{
 				'data'=>$result
 			    );
 	}
+	public function get_account_by_order($ids)
+	{
+		foreach($ids as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
+		$this->db->order_by('modifyTime', 'desc');
+		$query = $this->db->get('t_account');
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
 	public function get_account_by_id($ids)
 	{
 		foreach($ids as $key=>$value)
