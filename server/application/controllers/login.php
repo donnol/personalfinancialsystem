@@ -9,9 +9,9 @@
 		{
 			$where = array();
 
-			if( $name = $this->input->post('name'))
+			if( ($name = $this->input->post('name')) !== FALSE )
 				$where['name'] = $name;
-			if( $pwd = $this->input->post('password'))
+			if( ($pwd = $this->input->post('password')) !== FALSE )
 				$where['pwd'] = $pwd;
 			
 			$data['json'] = $this->login_service->checkin($where);

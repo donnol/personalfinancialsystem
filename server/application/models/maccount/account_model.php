@@ -64,9 +64,9 @@ class Account_model extends CI_Model{
 				'data'=>$result
 			    );
 	}
-	public function get_account_by_id($where)
+	public function get_account_by_id($ids)
 	{
-		foreach($where as $key=>$value)
+		foreach($ids as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}
@@ -78,9 +78,9 @@ class Account_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function get_account_by_name($where)
+	public function get_account_by_name($names)
 	{
-		foreach($where as $key=>$value)
+		foreach($names as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}
@@ -92,9 +92,9 @@ class Account_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function del($where)
+	public function del($ids)
 	{
-		foreach($where as $key=>$value)
+		foreach($ids as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}

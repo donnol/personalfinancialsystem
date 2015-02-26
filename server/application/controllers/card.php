@@ -18,15 +18,15 @@ class Card extends CI_Controller{
 		$where = array();
 		$limit = array();
 
-		if( $userId = $result['data'])
-			$where['userId'] = $userId;
-		if( $name = $this->input->get('name'))
-			$where['name'] = $nam;
-		if( $remark = $this->input->get('remark'))
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+		if( ($name = $this->input->get('name')) !== FALSE )
+			$where['name'] = $name;
+		if( ($remark = $this->input->get('remark')) !== FALSE )
 			$where['remark'] = $remark;
-		if( $pageIndex = $this->input->get('pageIndex'))
+		if( ($pageIndex = $this->input->get('pageIndex')) !== FALSE )
 			$limit['pageIndex'] = $pageIndex;
-		if( $pageSize = $this->input->get('pageSize'))
+		if( ($pageSize = $this->input->get('pageSize')) !== FALSE )
 			$limit['pageSize'] = $pageSize;
 
 		$data['json'] = $this->card_service->search($where, $limit);
@@ -42,9 +42,9 @@ class Card extends CI_Controller{
 			return;
 		}
 		$where = array();
-		if( $userId = $result['data'])
-			$where['userI'] = $userId;
-		if( $cardId = $this->input->get('cardId'))
+		$userId = $result['data'];
+		$where['userI'] = $userId;
+		if( ($cardId = $this->input->get('cardId')) !== FALSE )
 			$where['cardId'] = $cardId;
 
 		$data['json'] = $this->card_service->get_card_by_id($where);
@@ -61,7 +61,7 @@ class Card extends CI_Controller{
 		}
 		$where = array();
 
-		if( $cardId = $this->input->post('cardId'))
+		if( ($cardId = $this->input->post('cardId')) !== FALSE )
 			$where['cardId'] = $cardId;
 
 		$data['json'] = $this->card_service->del($where);
@@ -78,17 +78,17 @@ class Card extends CI_Controller{
 		}
 		$add_data = array();
 
-		if( $userId = $result['data'])
-			$add_data['userId'] = $userId;
-		if( $name = $this->input->post('name'))
+		$userId = $result['data'];
+		$add_data['userId'] = $userId;
+		if( ($name = $this->input->post('name')) !== FALSE )
 			$add_data['name'] = $name;
-		if( $bank = $this->input->post('bank'))
+		if( ($bank = $this->input->post('bank')) !== FALSE )
 			$add_data['bank'] = $bank;
-		if( $card = $this->input->post('card'))
+		if( ($card = $this->input->post('card')) !== FALSE )
 			$add_data['card'] = $card;
-		if( $money = $this->input->post('money'))
+		if( ($money = $this->input->post('money')) !== FALSE )
 			$add_data['money'] = $money;
-		if( $remark = $this->input->post('remark'))
+		if( ($remark = $this->input->post('remark')) !== FALSE )
 			$add_data['remark'] = $remark;
 		
 		$data['json'] = $this->card_service->add($add_data);
@@ -106,19 +106,19 @@ class Card extends CI_Controller{
 		$where = array();
 		$mod_data = array();
 
-		if( $userId = $result['data'])
-			$where['userId'] = $userId;
-		if( $cardId = $this->input->post('cardId'))
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+		if( ($cardId = $this->input->post('cardId')) !== FALSE )
 			$where['cardId'] = $cardId;
-		if( $name = $this->input->post('name'))
+		if( ($name = $this->input->post('name')) !== FALSE )
 			$mod_data['name'] = $name;
-		if( $bank = $this->input->post('bank'))
+		if( ($bank = $this->input->post('bank')) !== FALSE )
 			$mod_data['bank'] = $bank;
-		if( $card = $this->input->post('card'))
+		if( ($card = $this->input->post('card')) !== FALSE )
 			$mod_data['card'] = $card;
-		if( $money = $this->input->post('money'))
+		if( ($money = $this->input->post('money')) !== FALSE )
 			$mod_data['money'] = $money;
-		if( $remark = $this->input->post('remark'))
+		if( ($remark = $this->input->post('remark')) !== FALSE )
 			$mod_data['remark'] = $remark;
 
 		$data['json'] = $this->card_service->mod($where, $mod_data);

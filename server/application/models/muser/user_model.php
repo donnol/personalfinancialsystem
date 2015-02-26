@@ -5,9 +5,9 @@ class User_model extends CI_Model{
 		parent::__construct();
 		$this->load->database();
 	}
-	public function get_user_by_id($where)
+	public function get_user_by_id($ids)
 	{
-		foreach($where as $key=>$value)
+		foreach($ids as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}
@@ -19,9 +19,9 @@ class User_model extends CI_Model{
 				'data'=>$data
 			    );
 	}
-	public function get_user_by_name($where)
+	public function get_user_by_name($names)
 	{
-		foreach($where as $key=>$value)
+		foreach($names as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}
@@ -70,9 +70,9 @@ class User_model extends CI_Model{
 				'data'=>$result
 			    );
 	}
-	public function del($where)
+	public function del($ids)
 	{
-		foreach($where as $key=>$value)
+		foreach($ids as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}

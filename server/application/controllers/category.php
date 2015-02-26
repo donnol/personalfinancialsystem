@@ -16,19 +16,18 @@ class Category extends CI_Controller{
 			$this->load->view('json', $data);
 			return;
 		}
-		$userId = $result['data'];
 		$where = array();
 		$limit = array();
 
-		if( $userId != FALSE )
-			$where['userId'] = $userId;
-		if( $name = $this->input->get('name')) 
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+		if( ($name = $this->input->get('name')) !== FALSE ) 
 			$where['name'] = $name;
-		if( $remark = $this->input->get('remark'))
+		if( ($remark = $this->input->get('remark')) !== FALSE )
 			$where['remark'] = $remark;
-		if( $pageIndex = $this->input->get('pageIndex'))
+		if( ($pageIndex = $this->input->get('pageIndex')) !== FALSE )
 			$limit['pageIndex'] = $pageIndex;
-		if( $pageSize = $this->input->get('pageSize'))
+		if( ($pageSize = $this->input->get('pageSize')) !== FALSE )
 			$limit['pageSize'] = $pageSize;
 
 		$data['json'] = $this->category_service->search($where, $limit);
@@ -45,9 +44,9 @@ class Category extends CI_Controller{
 		}
 		$where = array();
 
-		if( $userId = $result['data'])
-			$where['userId'] = $userId;
-		if( $categoryId = $this->input->get('categoryId'))
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+		if( ($categoryId = $this->input->get('categoryId')) !== FALSE )
 			$where['categoryId'] = $categoryId;
 
 		$data['json'] = $this->category_service->get_category_by_id($where);
@@ -64,9 +63,7 @@ class Category extends CI_Controller{
 		}
 		$where = array();
 
-		if( $userId = $result['data'])
-			$where['userId'] = $userId;
-		if( $categoryId = $this->input->post('categoryId'))
+		if( ($categoryId = $this->input->post('categoryId')) !== FALSE )
 			$where['categoryId'] = $categoryId;
 
 		$data['json'] = $this->category_service->del($where);
@@ -83,11 +80,11 @@ class Category extends CI_Controller{
 		}	
 		$add_data = array();
 
-		if( $userId = $result['data'])
-			$add_data['userId'] = $userId;
-		if( $name = $this->input->post('name'))
+		$userId = $result['data'];
+		$add_data['userId'] = $userId;
+		if( ($name = $this->input->post('name')) !== FALSE )
 			$add_data['name'] = $name;
-		if( $remark = $this->input->post('remark'))
+		if( ($remark = $this->input->post('remark')) !== FALSE )
 			$add_data['remark'] = $remark;
 
 		$data['json'] = $this->category_service->add($add_data);
@@ -105,13 +102,13 @@ class Category extends CI_Controller{
 		$where = array();
 		$mod_data = array();
 
-		if( $userId = $result['data'])
-			$where['userId'] = $userId;
-		if( $categoryId = $this->input->post('categoryId'))
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+		if( ($categoryId = $this->input->post('categoryId')) !== FALSE )
 			$where['categoryId'] = $categoryId;
-		if( $name = $this->input->post('name'))
+		if( ($name = $this->input->post('name')) !== FALSE )
 			$mod_data['name'] = $name;
-		if( $remark = $this->input->post('remark'))
+		if( ($remark = $this->input->post('remark')) !== FALSE )
 			$mod_data['remark'] = $remark;
 
 		$data['json'] = $this->category_service->mod($where, $mod_data);
