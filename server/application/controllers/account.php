@@ -167,11 +167,11 @@ class Account extends CI_Controller{
 		$userId = $result['data'];
 		$where['userId'] = $userId;
 
-		if( ($year = $this->input->post('year')) !== FALSE )
+		if( ($year = $this->input->get('year')) !== FALSE )
 			$where['year'] = $year;
-		if( ($week = $this->input->post('week')) !== FALSE )
+		if( ($week = $this->input->get('week')) !== FALSE )
 			$where['week'] = $week;
-		if( ($type = $this->input->post('type')) !== FALSE )
+		if( ($type = $this->input->get('type')) !== FALSE )
 			$where['type'] = $type;
 
 		$data['json'] = $this->account_service->get_week_detail_type_statistic($where);
