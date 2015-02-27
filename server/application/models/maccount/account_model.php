@@ -64,13 +64,55 @@ class Account_model extends CI_Model{
 				'data'=>$result
 			    );
 	}
-	public function get_account_by_order($ids)
+	public function get_account_by_order($ids, $order)
 	{
 		foreach($ids as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}
-		$this->db->order_by('modifyTime', 'desc');
+		foreach($order as $key=>$value)
+		{
+			$this->db->order_by($key, $value);
+		}
+		$query = $this->db->get('t_account');
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function get_min_time()
+	{
+		$this->db->select_min('createTime');
+		$query = $this->db->get('t_account');
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function get_max_time()
+	{
+		$this->db->select_max('createTime');
+		$query = $this->db->get('t_account');
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function get_sum_money($where, $group)
+	{
+		$this->db->select('type');
+		$this->db->select_sum('money');
+		foreach($where as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
+		$this->db->group_by($group);
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
 		return array(

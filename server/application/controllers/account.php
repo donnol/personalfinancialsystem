@@ -149,9 +149,9 @@ class Account extends CI_Controller{
 		}
 
 		$userId = $result['data'];
-		$where['userId'] = $userId;
+		$ids['userId'] = $userId;
 
-		$data['json'] = $this->account_service->get_week_type_statistic($where);
+		$data['json'] = $this->account_service->get_week_type_statistic($ids);
 		$this->load->view('json', $data);
 	}
 	public function getWeekDetailTypeStatistic()
