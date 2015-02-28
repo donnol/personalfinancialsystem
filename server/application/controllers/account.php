@@ -177,4 +177,41 @@ class Account extends CI_Controller{
 		$data['json'] = $this->account_service->get_week_detail_type_statistic($where);
 		$this->load->view('json', $data);
 	}
+	public function getWeekCardStatistic()
+	{
+		$result = $this->login_service->islogin();
+		if( $result['code'] != 0 )
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+
+		$data['json'] = $this->account_service->get_week_card_statistic($where);
+		$this->load->view('json', $data);
+	}
+	public function getWeekDetailCardStatistic()
+	{
+		$result = $this->login_service->islogin();
+		if( $result['code'] != 0 )
+		{
+			$data['json'] = $result;
+			$this->load->view('json', $data);
+			return;
+		}
+		$userId = $result['data'];
+		$where['userId'] = $userId;
+
+		if( ($year = $this->input->get('year')) !== FALSE )
+			$where['year'] = $year;
+		if( ($week = $this->input->get('week')) !== FALSE )
+			$where['week'] = $week;
+		if( ($cardId = $this->input->get('cardId')) !== FALSE )
+			$where['cardId'] = $cardId;
+
+		$data['json'] = $this->account_service->get_week_detail_card_statistic($where);
+		$this->load->view('json', $data);
+	}
 }
