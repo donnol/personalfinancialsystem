@@ -50,8 +50,14 @@ class Account_service extends CI_Model{
 		$up_time_day = date('Y-m-d', $cmin + (7 - $min_week_day) * 3600 * 24);
 		$min_up_time = $up_time_day.' 23:59:59';
 
-		$group = 'type';
+		$group = array(
+			'type'=>'type'
+			);
 		$where['userId'] = $ids['userId'];
+		$select = array(
+			'type'=>'type',
+			'money'=>'money'
+		);
 		for($i = 0; ;$i++)
 		{
 			$down_time = strtotime($min_down_time) + $i * 7 * 3600 * 24;
@@ -62,7 +68,7 @@ class Account_service extends CI_Model{
 
 			$where['createTime >='] = date('Y-m-d H:i:s', $down_time);
 			$where['createTime <='] = date('Y-m-d H:i:s', $up_time); 
-			$result = $this->account_model->get_sum_money($where, $group);
+			$result = $this->account_model->sel($select, $where, $group);
 
 			if( $result['data'] != FALSE )
 			{
@@ -210,12 +216,17 @@ class Account_service extends CI_Model{
 				'userId'=>$where['userId'],
 				'type'=>$where['type']
 				);
-		$group = 'categoryId';
+		$group = array(
+				'categoryId'=>'categoryId'
+			);
 		$result = $this->account_model->sel($select, $where_time, $group);
 		if( $result['data'] != FALSE )
 		{
-			$group = 'type';
-			$temp = $this->account_model->get_sum_money($where_time, $group);
+			$select = array(
+				'money'=>'money'	
+			);
+			$group = array();
+			$temp = $this->account_model->sel($select, $where_time, $group);
 			$precent = round($result['data'][0]['money']/$temp['data'][0]['money']*100, 2).'%';
 			$data[0] = array(
 					'categoryId'=>$result['data'][0]['categoryId'],
@@ -226,12 +237,7 @@ class Account_service extends CI_Model{
 		}
 		else
 		{
-			$data[0] = array(
-					'categoryId'=>'',
-					'categoryName'=>'',
-					'money'=>0,
-					'precent'=>'0%'
-				     );
+			$data = array();
 		}
 		return array(
 				'code'=>0,

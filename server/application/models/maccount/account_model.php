@@ -104,52 +104,27 @@ class Account_model extends CI_Model{
 			'data'=>$data
 		);
 	}
-	public function get_sum_money($where, $group)
-	{
-		$this->db->select('type');
-		$this->db->select_sum('money');
-		foreach($where as $key=>$value)
-		{
-			$this->db->where($key, $value);
-		}
-		$this->db->group_by($group);
-		$query = $this->db->get('t_account');
-		$data = $query->result_array();
-		return array(
-			'code'=>0,
-			'msg'=>'',
-			'data'=>$data
-		);
-	}
-	public function get_sum_money_by_type($where, $group)
-	{
-		$this->db->select_sum('money');
-		foreach($where as $key=>$value)
-		{
-			$this->db->where($key, $value);
-		}
-		$this->db->group_by($group);
-		$query = $this->db->get('t_account');
-		$data = $query->result_array();
-		return array(
-			'code'=>0,
-			'msg'=>'',
-			'data'=>$data
-		);
-	}
 	public function sel($select, $where, $group)
 	{
 		foreach($select as $key=>$value)
 		{
 			if($key == 'money')
+			{
 				$this->db->select_sum($value);
-			$this->db->select($value);
+			}
+			else
+			{
+				$this->db->select($value);
+			}
 		}
 		foreach($where as $key=>$value)
 		{
 			$this->db->where($key, $value);
 		}
-		$this->db->group_by($group);
+		foreach($group as $key=>$value)
+		{
+			$this->db->group_by($value);
+		}
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
 		return array(
