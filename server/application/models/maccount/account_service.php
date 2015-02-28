@@ -414,6 +414,61 @@ class Account_service extends CI_Model{
 				'data'=>$data
 			    );
 	}
+	public function get_week_detail_card_statistic($where)
+	{
+		$year = $where['year'];
+		$week = $where['week'];
+		$first_week_day = date('w', strtotime($year.'-01-01 00:00:00'));
+		if( $week == '1')
+		{
+			$down_time = $year.'-01-01 00:00:00';
+			$down_time_unix = strtotime($down_time);
+			$up_time = date('Y-m-d H:i:s', $down_time_unix + (7 - $first_week_day + 1) * 24 * 3600 );
+		}
+		$first_day = $year.'-01-01 00:00:00';
+		$first_time = strtotime($first_day);
+		$down_time = date('Y-m-d H:i:s', $first_time - ($first_week_day - 1 - ($week - 1)*7) * 24 * 3600);
+		$up_time = date('Y-m-d H:i:s', strtotime($down_time) + 7 * 24 * 3600 );
+		
+		$select = array(
+				'money'=>'money',
+				'type'=>'type'
+			       );
+		$where_time = array(
+				'createTime >='=>$down_time,
+				'createTime <='=>$up_time,
+				'userId'=>$where['userId'],
+				'cardId'=>$where['cardId']
+				);
+		$group = array(
+				'type'=>'type'
+			      );
+		$result = $this->account_model->sel($select, $where_time, $group);
+		if( $result['data'] != FALSE )
+		{
+			$select = array(
+					'money'=>'money'	
+				       );
+			$group = array();
+			$temp = $this->account_model->sel($select, $where_time, $group);
+			$precent = round($result['data'][0]['money']/$temp['data'][0]['money']*100, 2).'%';
+			$data[0] = array(
+					'type'=>'',
+					'typeName'=>'',
+					'money'=>$result['data'][0]['money'],
+					'precent'=>$precent
+					);
+		}
+		else
+		{
+			$data = array();
+		}
+		return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>$data
+			    );
+	}
 	public function del($where)
 	{
 		$result = $this->account_model->del($where);
