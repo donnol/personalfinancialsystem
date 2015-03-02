@@ -5,6 +5,7 @@ class Account_service extends CI_Model{
 		parent::__construct();
 		$this->load->model('maccount/account_model', 'account_model');
 		$this->load->model('mcard/card_model', 'card_model');
+		$this->load->model('mcategory/category_model', 'category_model');
 	}
 	public function search($where, $limit)
 	{
@@ -223,18 +224,34 @@ class Account_service extends CI_Model{
 		$result = $this->account_model->sel($select, $where_time, $group);
 		if( $result['data'] != FALSE )
 		{
+			foreach($result['data'] as $key=>$value)
+			{
 			$select = array(
 					'money'=>'money'	
 				       );
 			$group = array();
 			$temp = $this->account_model->sel($select, $where_time, $group);
-			$precent = round($result['data'][0]['money']/$temp['data'][0]['money']*100, 2).'%';
-			$data[0] = array(
-					'categoryId'=>$result['data'][0]['categoryId'],
-					'categoryName'=>$result['data'][0]['name'],
-					'money'=>$result['data'][0]['money'],
-					'precent'=>$precent
-					);
+			if( $value['categoryId'] === '0')
+			{
+				$data = array(
+				);
+			}
+			else
+			{
+			$ids = array(
+						'categoryId'=>$value['categoryId']
+					    );
+			
+				$cate_names = $this->category_model->get_category_by_id($ids);
+				$precent = round($value['money']/$temp['data'][0]['money']*100, 2).'%';
+				$data[$key] = array(
+						'categoryId'=>$value['categoryId'],
+						'categoryName'=>$cate_names['data'][0]['name'],
+						'money'=>$value['money'],
+						'precent'=>$precent
+						);
+			}
+			}
 		}
 		else
 		{
@@ -292,7 +309,7 @@ class Account_service extends CI_Model{
 				$where['cardId'] = $value['cardId'];
 				$result = $this->account_model->sel($select, $where, $group);
 
-				if( $result['data'] != FALSE )
+				if( $result['data'][0]['money'] != NULL )
 				{
 					$week = $min_week + $i;
 					if($week > 53)
@@ -311,7 +328,7 @@ class Account_service extends CI_Model{
 							'week'=>$week,
 							'cardId'=>$value['cardId'],
 							'cardName'=>$value['name'],
-							'money'=>$value['money']
+							'money'=>$result['data'][0]['money']
 							);
 				}
 				else
@@ -375,18 +392,38 @@ class Account_service extends CI_Model{
 		$result = $this->account_model->sel($select, $where_time, $group);
 		if( $result['data'] != FALSE )
 		{
+			foreach($result['data'] as $key=>$value)
+			{
 			$select = array(
 					'money'=>'money'	
 				       );
 			$group = array();
 			$temp = $this->account_model->sel($select, $where_time, $group);
-			$precent = round($result['data'][0]['money']/$temp['data'][0]['money']*100, 2).'%';
-			$data[0] = array(
-					'type'=>'',
-					'typeName'=>'',
-					'money'=>$result['data'][0]['money'],
+			$precent = round($value['money']/$temp['data'][0]['money']*100, 2).'%';
+			switch($value['type'])
+			{
+				case '1':
+					$type_name = '收入';
+					break;
+				case '2':
+					$type_name = '支出';
+					break;
+				case '3':
+					$type_name = '转账收入';
+					break;
+				case '4':
+					$type_name = '转账支出';
+					break;
+				default:
+					break;
+			}
+			$data[$key] = array(
+					'type'=>$result['data'][0]['type'],
+					'typeName'=>$type_name,
+					'money'=>$value['money'],
 					'precent'=>$precent
 					);
+			}
 		}
 		else
 		{
