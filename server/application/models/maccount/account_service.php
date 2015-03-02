@@ -267,16 +267,15 @@ class Account_service extends CI_Model{
 		$min_up_time = $up_time_day.' 23:59:59';
 
 		$select = array(
-				'money'=>'money',
-				'cardId'=>'cardId'
+				'money'=>'money'
 			       );
 		$where['userId'] = $ids['userId'];
 		$group = array(
-				'cardId'=>'cardId'
 			      );
 
 		$cards = $this->card_model->search($ids, array());
 		$count = $cards['data']['count'];
+		$card_data = $cards['data']['data'];
 		for($i = 0; ;$i++)
 		{
 			$down_time = strtotime($min_down_time) + $i * 7 * 3600 * 24;
@@ -287,122 +286,52 @@ class Account_service extends CI_Model{
 
 			$where['createTime >='] = date('Y-m-d H:i:s', $down_time);
 			$where['createTime <='] = date('Y-m-d H:i:s', $up_time);
-			$result = $this->account_model->sel($select, $where, $group);
 
-			if( $result['data'] != FALSE )
+			foreach($card_data as $key=>$value)
 			{
-				$week = $min_week + $i;
-				if($week > 53)
-				{
-					$year = $min_year + 1;
-					$week = 1;
-				}
-				else
-				{
-					$year = $min_year;
-				}
+				$where['cardId'] = $value['cardId'];
+				$result = $this->account_model->sel($select, $where, $group);
 
-				if( count($result['data']) == $count )
+				if( $result['data'] != FALSE )
 				{
-					for( $j = 0; $j < count($result['data']); $j ++ )
+					$week = $min_week + $i;
+					if($week > 53)
 					{
-						if( $result['data'][$j]['cardId'] != '0' )
-						{
-							$card_ids = array(
-									'cardId'=>$result['data'][$j]['cardId'],
-									);
-							$cardNames = $this->card_model->get_card_by_id($card_ids);
-							$data[$j + $i * $count] = array(
-									'name'=>$year.'年'.$week.'周',
-									'year'=>$year,
-									'week'=>$week,
-									'cardId'=>$result['data'][$j]['cardId'],
-									'cardName'=>$cardNames['data'][0]['name'],
-									'money'=>$result['data'][$j]['money']
-									);
-						}
-						else
-						{
-							$data[$j + $i * $count] = array(
-									'name'=>$year.'年'.$week.'周',
-									'year'=>$year,
-									'week'=>$week,
-									'cardId'=>'',
-									'cardName'=>'',
-									'money'=>0
-									);
-						}
+						$year = $min_year + 1;
+						$week = 1;
+					}
+					else
+					{
+						$year = $min_year;
 					}
 
-				}
-				else
-				{
-					for($j = 0; $j < $count; $j++)
-					{
-						if( $j < count($result['data']) )
-						{
-						if( $result['data'][$j]['cardId'] != '0' )
-						{
-							$card_ids = array(
-									'cardId'=>$result['data'][$j]['cardId'],
-									);
-							$cardNames = $this->card_model->get_card_by_id($card_ids);
-							$data[$j + $i * $count] = array(
-									'name'=>$year.'年'.$week.'周',
-									'year'=>$year,
-									'week'=>$week,
-									'cardId'=>$result['data'][$j]['cardId'],
-									'cardName'=>$cardNames['data'][0]['name'],
-									'money'=>$result['data'][$j]['money']
-									);
-						}
-						else
-						{
-							$data[$j + $i * $count] = array(
-									'name'=>$year.'年'.$week.'周',
-									'year'=>$year,
-									'week'=>$week,
-									'cardId'=>'',
-									'cardName'=>'',
-									'money'=>0
-									);
-						}
-						}
-						else
-						{
-							$data[$j + $i * $count] = array(
-									'name'=>$year.'年'.$week.'周',
-									'year'=>$year,
-									'week'=>$week,
-									'cardId'=>'',
-									'cardName'=>'',
-									'money'=>0
-									);
-						}
-					}
-				}
-
-			}
-			else
-			{
-				$week = $min_week + $i;
-				if($week > 53)
-				{
-					$year = $min_year + 1;
-					$week = 1;
-				}
-				else
-				{
-					$year = $min_year;
-				}
-				for($j = 0; $j < $count; $j++)
-				{
-					$data[$j + $i * $count] = array(
+					$data[$key + $i * $count] = array(
 							'name'=>$year.'年'.$week.'周',
 							'year'=>$year,
 							'week'=>$week,
-							'cardId'=>'',
-							'cardName'=>'',
+							'cardId'=>$value['cardId'],
+							'cardName'=>$value['name'],
+							'money'=>$value['money']
+							);
+				}
+				else
+				{
+					$week = $min_week + $i;
+					if($week > 53)
+					{
+						$year = $min_year + 1;
+						$week = 1;
+					}
+					else
+					{
+						$year = $min_year;
+					}
+					$data[$key + $i * $count] = array(
+							'name'=>$year.'年'.$week.'周',
+							'year'=>$year,
+							'week'=>$week,
+							'cardId'=>$value['cardId'],
+							'cardName'=>$value['name'],
 							'money'=>0
 							);
 				}
@@ -429,7 +358,7 @@ class Account_service extends CI_Model{
 		$first_time = strtotime($first_day);
 		$down_time = date('Y-m-d H:i:s', $first_time - ($first_week_day - 1 - ($week - 1)*7) * 24 * 3600);
 		$up_time = date('Y-m-d H:i:s', strtotime($down_time) + 7 * 24 * 3600 );
-		
+
 		$select = array(
 				'money'=>'money',
 				'type'=>'type'
@@ -488,6 +417,24 @@ class Account_service extends CI_Model{
 					'msg'=>'name is already exist',
 					'data'=>''
 				    );
+
+		$ids = array(
+				'userId'=>$data['userId'],
+				'cardId'=>$data['cardId']
+			    );
+		$cards = $this->card_model->get_card_by_id($ids);
+		if( $data['type'] === '1' OR $data['type'] === '3' )
+		{
+			$card_money = $cards['data'][0]['money'] + $data['money'];
+		}
+		elseif( $data['type'] === '2' OR $data['type'] === '4' )
+		{
+			$card_money = $cards['data'][0]['money'] - $data['money'];
+		}
+		$card_moneys = array(
+				'money'=>$card_money
+				);
+		$this->card_model->mod($ids, $card_moneys);
 		$result = $this->account_model->add($data);
 		return $result;
 	}
@@ -501,6 +448,35 @@ class Account_service extends CI_Model{
 		$accounts = $result['data'];
 		if( $accounts[0]['name'] == $data['name'] )
 		{
+			if( isset($data['money']) && isset($data['cardId']) )
+			{
+				$ids = array(
+						'userId'=>$where['userId'],
+						'cardId'=>$data['cardId']
+					    );
+				$cards = $this->card_model->get_card_by_id($ids);
+				if( $accounts[0]['type'] === '1' OR $accounts[0]['type'] === '3' )
+				{
+					$origin_money = $cards['data'][0]['money'] - $accounts[0]['money'];
+				}
+				elseif( $accounts[0]['type'] === '2' OR $accounts[0]['type'] === '4' )
+				{
+					$origin_money = $cards['data'][0]['money'] + $accounts[0]['money'];
+				}
+
+				if( $data['type'] === '1' OR $data['type'] === '3' )
+				{
+					$card_money = $origin_money  + $data['money'];
+				}
+				elseif( $data['type'] === '2' OR $data['type'] === '4' )
+				{
+					$card_money = $origin_money - $data['money'];
+				}
+				$card_moneys = array(
+						'money'=>$card_money
+						);
+				$this->card_model->mod($ids, $card_moneys);
+			}
 			$result = $this->account_model->mod($where, $data);
 			return $result;
 		}
@@ -517,6 +493,35 @@ class Account_service extends CI_Model{
 					'data'=>''
 				    );
 
+		if( isset($data['money']) && isset($data['cardId']) )
+		{
+			$ids = array(
+					'userId'=>$where['userId'],
+					'cardId'=>$data['cardId']
+				    );
+			$cards = $this->card_model->get_card_by_id($ids);
+			if( $accounts[0]['type'] === '1' OR $accounts[0]['type'] === '3' )
+			{
+				$origin_money = $cards['data'][0]['money'] - $accounts[0]['money'];
+			}
+			elseif( $accounts[0]['type'] === '2' OR $accounts[0]['type'] === '4' )
+			{
+				$origin_money = $cards['data'][0]['money'] + $accounts[0]['money'];
+			}
+
+			if( $data['type'] === '1' OR $data['type'] === '3' )
+			{
+				$card_money = $origin_money + $data['money'];
+			}
+			elseif( $data['type'] === '2' OR $data['type'] === '4' )
+			{
+				$card_money = $origin_money - $data['money'];
+			}
+			$card_moneys = array(
+					'money'=>$card_money
+					);
+			$this->card_model->mod($ids, $card_moneys);
+		}
 		$result = $this->account_model->mod($where, $data);
 		return $result;
 	}

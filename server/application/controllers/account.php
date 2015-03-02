@@ -116,26 +116,26 @@ class Account extends CI_Controller{
 		}
 
 		$where = array();
-		$data = array();
+		$mod_data = array();
 
 		$userId = $result['data'];
 		$where['userId'] = $userId;
 		if( ($accountId = $this->input->post('accountId')) !== FALSE )
 			$where['accountId'] = $accountId;
 		if( ($name = $this->input->post('name')) !== FALSE )
-			$data['name'] = $name;
+			$mod_data['name'] = $name;
 		if( ($remark = $this->input->post('remark')) !== FALSE )
-			$data['remark'] = $remark;
+			$mod_data['remark'] = $remark;
 		if( ($money = $this->input->post('money')) !== FALSE )
-			$data['money'] = $money;
+			$mod_data['money'] = $money;
 		if( ($type = $this->input->post('type')) !== FALSE )
-			$data['type'] = $type;
+			$mod_data['type'] = $type;
 		if( ($categoryId = $this->input->post('categoryId')) !== FALSE )
-			$data['categoryId'] = $categoryId;
+			$mod_data['categoryId'] = $categoryId;
 		if( ($cardId = $this->input->post('cardId')) !== FALSE )
-			$data['cardId'] = $cardId;
+			$mod_data['cardId'] = $cardId;
 
-		$data['json'] = $this->account_service->mod($where, $data);
+		$data['json'] = $this->account_service->mod($where, $mod_data);
 		$this->load->view('json', $data);
 	}
 	public function getWeekTypeStatistic()

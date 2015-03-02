@@ -43,7 +43,7 @@ class Card extends CI_Controller{
 		}
 		$where = array();
 		$userId = $result['data'];
-		$where['userI'] = $userId;
+		$where['userId'] = $userId;
 		if( ($cardId = $this->input->get('cardId')) !== FALSE )
 			$where['cardId'] = $cardId;
 
