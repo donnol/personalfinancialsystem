@@ -60,6 +60,10 @@ class Account_service extends CI_Model{
 				'type'=>'type',
 				'money'=>'money'
 			       );
+		$in_money = 0;
+		$out_money = 0;
+		$transfer_in_money = 0;
+		$transfer_out_money = 0;
 		for($i = 0; ;$i++)
 		{
 			$down_time = strtotime($min_down_time) + $i * 7 * 3600 * 24;
