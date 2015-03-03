@@ -69,8 +69,8 @@ class Account extends CI_Controller{
 			return;
 		}
 		$where = array();
-
-		if( $accountId = $this->input->post('accountId'))
+		$where['userId'] = $result['data'];
+		if( ($accountId = $this->input->post('accountId')) !== FALSE )
 			$where['accountId'] = $accountId;
 
 		$data['json'] = $this->account_service->del($where);

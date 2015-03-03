@@ -15,9 +15,12 @@ class Cookie_model extends CI_Model{
 			'data'=>$data
 		);
 	}
-	public function get_cookie_by_id($cookieId)
+	public function get_cookie_by_id($ids)
 	{
-		$this->db->where('session_id', $cookieId);
+		foreach($ids as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('ci_sessions');
 		$data = $query->result_array();
 		return array(
@@ -35,9 +38,12 @@ class Cookie_model extends CI_Model{
 			'data'=>''
 		);
 	}
-	public function del_cookie($cookieId)
+	public function del_cookie($ids)
 	{
-		$this->db->where('session_id', $cookieId);
+		foreach($ids as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$this->db->delete('ci_sessions');
 		return array(
 			'code'=>0,

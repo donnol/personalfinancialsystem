@@ -354,11 +354,22 @@ class Account_service extends CI_Model{
 				}
 			}
 		}
-		return array(
+		if( $count != 0 )
+		{
+			return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>$data
 			    );
+		}
+		else
+		{
+			return array(
+				'code'=>0,
+				'msg'=>'',
+				'data'=>array()
+			);
+		}
 	}
 	public function get_week_detail_card_statistic($where)
 	{
@@ -437,8 +448,41 @@ class Account_service extends CI_Model{
 	}
 	public function del($where)
 	{
+		$accounts = $this->account_model->get_account_by_id($where);
 		$result = $this->account_model->del($where);
-		return $result;
+		if( $result['code'] == 0 )
+		{
+			$userId = $where['userId'];
+			if( ($cardId = $accounts['data'][0]['cardId']) !== '0' )
+			{
+			$ids = array(
+				'cardId'=>$cardId,
+				'userId'=>$userId
+			);
+			$cards = $this->card_model->get_card_by_id($ids);
+			if( $accounts['data'][0]['type'] === '1' OR $accounts['data'][0]['type'] === '3' )
+			{
+				$card_money = $cards['data'][0]['money'] - $accounts['data'][0]['money'];
+			}
+			elseif( $accounts['data'][0]['type'] === '2' OR $accounts['data'][0]['type'] === '4' )
+			{
+				$card_money = $cards['data'][0]['money'] + $accounts['data'][0]['money'];
+			}
+			$card_moneys = array(
+				'money'=>$card_money
+			);
+			$this->card_model->mod($ids, $card_moneys);
+			}
+			return $result;
+		}
+		else
+		{
+			return array(
+				'code'=>1,
+				'msg'=>'delete failed',
+				'data'=>''
+			);
+		}
 	}
 	public function add($data)
 	{

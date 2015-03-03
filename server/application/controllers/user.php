@@ -107,7 +107,7 @@ class User extends CI_Controller{
 			return;
 		}
 
-		$data['json'] = $this->user_service->del($where);
+		$data['json'] = $this->user_service->del($ids);
 		$this->load->view('json', $data);
 	}
 	public function add()

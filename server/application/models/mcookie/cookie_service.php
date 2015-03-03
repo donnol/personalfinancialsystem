@@ -15,9 +15,9 @@ class Cookie_service extends CI_Model{
 		$data = $this->cookie_model->get_cookie_by_id($cookieId);
 		return $data;
 	}
-	public function add_cookie($cookieId, $ipAddress, $userAgent, $lastActivity, $userData)
+	public function add_cookie($datas)
 	{
-		$data = $this->cookie_model->add_cookie($cookieId, $ipAddress, $userAgent, $lastActivity, $userData);
+		$data = $this->cookie_model->add_cookie($datas);
 		return $data;
 	}
 	public function del_cookie($cookieId)

@@ -58,8 +58,11 @@ class Login_service extends CI_Model{
 		if(isset($_COOKIE['user']))
 		{
 			$val = $_COOKIE['user'];
+			$ids = array(
+				'session_id'=>$val
+				);
 			setcookie('user',$val, time()-3600, '/', null);
-			$this->cookie_model->del_cookie($val);
+			$this->cookie_model->del_cookie($ids);
 			return array(
 					'code'=>0,
 					'msg'=>'',
@@ -78,7 +81,10 @@ class Login_service extends CI_Model{
 		{
 			$ip = $this->input->ip_address();
 			$user_agent = $_SERVER['HTTP_USER_AGENT'];
-			$data = $this->cookie_model->get_cookie_by_id($_COOKIE['user']);
+			$ids = array(
+				'session_id'=>$_COOKIE['user']
+			);
+			$data = $this->cookie_model->get_cookie_by_id($ids);
 			$tmp = $data['data'];
 			if( count($tmp) != 0 && $ip == $tmp[0]['ip_address'] && $user_agent == $tmp[0]['user_agent'] )
 			{
