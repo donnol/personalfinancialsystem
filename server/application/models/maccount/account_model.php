@@ -82,9 +82,13 @@ class Account_model extends CI_Model{
 			'data'=>$data
 		);
 	}
-	public function get_min_time()
+	public function get_min_time($ids)
 	{
 		$this->db->select_min('createTime');
+		foreach($ids as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
 		return array(
@@ -93,9 +97,13 @@ class Account_model extends CI_Model{
 			'data'=>$data
 		);
 	}
-	public function get_max_time()
+	public function get_max_time($ids)
 	{
 		$this->db->select_max('createTime');
+		foreach($ids as $key=>$value)
+		{
+			$this->db->where($key, $value);
+		}
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
 		return array(

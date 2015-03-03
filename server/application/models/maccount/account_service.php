@@ -34,8 +34,16 @@ class Account_service extends CI_Model{
 	}
 	public function get_week_type_statistic($ids)
 	{
-		$min = $this->account_model->get_min_time();
-		$max = $this->account_model->get_max_time();
+		$min = $this->account_model->get_min_time($ids);
+		$max = $this->account_model->get_max_time($ids);
+		if( $min['data'][0]['createTime'] == NULL && $max['data'][0]['createTime'] == NULL)
+		{
+			return array(
+				'code'=>0,
+				'msg'=>'no data',
+				'data'=>array()
+			);	
+		}
 		$min_time = $min['data'][0];
 		$max_time = $max['data'][0];
 		$cmin = strtotime($min_time['createTime']);
@@ -75,20 +83,18 @@ class Account_service extends CI_Model{
 			$where['createTime >='] = date('Y-m-d H:i:s', $down_time);
 			$where['createTime <='] = date('Y-m-d H:i:s', $up_time); 
 			$result = $this->account_model->sel($select, $where, $group);
-
-			if( $result['data'] != FALSE )
+			$week = $min_week + $i;
+			if($week > 53)
 			{
-				$week = $min_week + $i;
-				if($week > 53)
-				{
-					$year = $min_year + 1;
-					$week = 1;
-				}
-				else
-				{
-					$year = $min_year;
-				}
-
+				$year = $min_year + 1;
+				$week = 1;
+			}
+			else
+			{
+				$year = $min_year;
+			}
+			if( count($result['data']) != 0 )
+			{
 				for( $j = 0; $j < count($result['data']); $j ++ )
 				{
 					switch($result['data'][$j]['type'])
@@ -109,8 +115,8 @@ class Account_service extends CI_Model{
 							break;
 					}
 				}
-
-				$data[0 + $i * 4] = array(
+			}
+			$data[0 + $i * 4] = array(
 						'name'=>$year.'年'.$week.'周',
 						'year'=>$year,
 						'week'=>$week,
@@ -118,7 +124,7 @@ class Account_service extends CI_Model{
 						'typeName'=>'收入',
 						'money'=>$in_money
 						);
-				$data[1 + $i * 4] = array(
+			$data[1 + $i * 4] = array(
 						'name'=>$year.'年'.$week.'周',
 						'year'=>$year,
 						'week'=>$week,
@@ -126,7 +132,7 @@ class Account_service extends CI_Model{
 						'typeName'=>'支出',
 						'money'=>$out_money
 						);
-				$data[2 + $i * 4] = array(
+			$data[2 + $i * 4] = array(
 						'name'=>$year.'年'.$week.'周',
 						'year'=>$year,
 						'week'=>$week,
@@ -134,7 +140,7 @@ class Account_service extends CI_Model{
 						'typeName'=>'转账收入',
 						'money'=>$transfer_in_money
 						);
-				$data[3 + $i * 4] = array(
+			$data[3 + $i * 4] = array(
 						'name'=>$year.'年'.$week.'周',
 						'year'=>$year,
 						'week'=>$week,
@@ -142,52 +148,6 @@ class Account_service extends CI_Model{
 						'typeName'=>'转账支出',
 						'money'=>$transfer_out_money
 						);
-			}
-			else
-			{
-				$week = $min_week + $i;
-				if($week > 53)
-				{
-					$year = $min_year + 1;
-					$week = 1;
-				}
-				else
-				{
-					$year = $min_year;
-				}
-				$data[0 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'1',
-						'typeName'=>'收入',
-						'money'=>0
-						);
-				$data[1 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'2',
-						'typeName'=>'支出',
-						'money'=>0
-						);
-				$data[2 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'3',
-						'typeName'=>'转账收入',
-						'money'=>0
-						);
-				$data[3 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'4',
-						'typeName'=>'转账支出',
-						'money'=>0
-						);
-			}
 		}
 		return array(
 				'code'=>0,
@@ -269,8 +229,8 @@ class Account_service extends CI_Model{
 	}
 	public function get_week_card_statistic($ids)
 	{
-		$min = $this->account_model->get_min_time();
-		$max = $this->account_model->get_max_time();
+		$min = $this->account_model->get_min_time($ids);
+		$max = $this->account_model->get_max_time($ids);
 		$min_time = $min['data'][0];
 		$max_time = $max['data'][0];
 		$cmin = strtotime($min_time['createTime']);
@@ -312,10 +272,7 @@ class Account_service extends CI_Model{
 			{
 				$where['cardId'] = $value['cardId'];
 				$result = $this->account_model->sel($select, $where, $group);
-
-				if( $result['data'][0]['money'] != NULL )
-				{
-					$week = $min_week + $i;
+				$week = $min_week + $i;
 					if($week > 53)
 					{
 						$year = $min_year + 1;
@@ -325,7 +282,8 @@ class Account_service extends CI_Model{
 					{
 						$year = $min_year;
 					}
-
+				if( $result['data'][0]['money'] != NULL )
+				{
 					$data[$key + $i * $count] = array(
 							'name'=>$year.'年'.$week.'周',
 							'year'=>$year,
@@ -337,16 +295,6 @@ class Account_service extends CI_Model{
 				}
 				else
 				{
-					$week = $min_week + $i;
-					if($week > 53)
-					{
-						$year = $min_year + 1;
-						$week = 1;
-					}
-					else
-					{
-						$year = $min_year;
-					}
 					$data[$key + $i * $count] = array(
 							'name'=>$year.'年'.$week.'周',
 							'year'=>$year,
