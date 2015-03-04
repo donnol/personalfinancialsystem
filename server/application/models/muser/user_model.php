@@ -58,6 +58,7 @@ class User_model extends CI_Model{
 
 		if( isset($limit['pageSize']) && isset($limit['pageIndex']) )
 			$this->db->limit($limit['pageSize'], $limit['pageIndex']);
+		$this->db->order_by('modifyTime', 'DESC');
 		$query = $this->db->get('t_user');
 		$data = $query->result_array();
 		$result = array(

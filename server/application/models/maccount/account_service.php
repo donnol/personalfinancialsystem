@@ -34,120 +34,78 @@ class Account_service extends CI_Model{
 	}
 	public function get_week_type_statistic($ids)
 	{
-		$min = $this->account_model->get_min_time($ids);
-		$max = $this->account_model->get_max_time($ids);
-		if( $min['data'][0]['createTime'] == NULL && $max['data'][0]['createTime'] == NULL)
+		$result = $this->account_model->sel_by_type($ids);
+		if( $result['code'] != 0 )
+			return $result;
+
+		foreach( $result['data'] as $key=>$value)
 		{
-			return array(
-				'code'=>0,
-				'msg'=>'no data',
-				'data'=>array()
-			);	
+			$result['data'][$key]['year'] = intval($value['year']);
+			$result['data'][$key]['week'] = intval($value['week']);
+			$result['data'][$key]['type'] = intval($value['type']);
+			$result['data'][$key]['money'] = intval($value['money']);
 		}
-		$min_time = $min['data'][0];
-		$max_time = $max['data'][0];
-		$cmin = strtotime($min_time['createTime']);
-		$cmax = strtotime($max_time['createTime']);
-		$min_week = date('W', $cmin);
-		$min_year = date('Y', $cmin);
-		$max_week = date('W', $cmax);
-		$max_year = date('Y', $cmax);
-		$min_week_day = date('w', $cmin);
-		$max_week_day = date('w', $cmax);
-
-		$down_time_day = date('Y-m-d', $cmin - $min_week_day * 3600 * 24);
-		$min_down_time = $down_time_day.' 00:00:00';
-		$up_time_day = date('Y-m-d', $cmin + (7 - $min_week_day) * 3600 * 24);
-		$min_up_time = $up_time_day.' 23:59:59';
-
-		$group = array(
-				'type'=>'type'
-			      );
-		$where['userId'] = $ids['userId'];
-		$select = array(
-				'type'=>'type',
-				'money'=>'money'
-			       );
-		$in_money = 0;
-		$out_money = 0;
-		$transfer_in_money = 0;
-		$transfer_out_money = 0;
-		for($i = 0; ;$i++)
+		$statistic = array();
+		foreach( $result['data'] as $key=>$value )
 		{
-			$down_time = strtotime($min_down_time) + $i * 7 * 3600 * 24;
-			$up_time = strtotime($min_up_time) + $i * 7 * 3600 * 24;
+			$year = $value['year'];
+			$week = $value['week'];
+			$type = $value['type'];
+			$money = $value['money'];
+			$statistic[$year][$week][$type] = $money;
+		}
 
-			if($up_time > ($cmax + 7 * 3600 * 24) )
-				break;
-
-			$where['createTime >='] = date('Y-m-d H:i:s', $down_time);
-			$where['createTime <='] = date('Y-m-d H:i:s', $up_time); 
-			$result = $this->account_model->sel($select, $where, $group);
-			$week = $min_week + $i;
-			if($week > 53)
+		$minTime = null;
+		$maxTime = null;
+		foreach( $result['data'] as $key=>$value )
+		{
+			if( $minTime == NULL || ($minTime['year']*100 + $minTime['week'] > $value['year']*100 + $value['week']))
 			{
-				$year = $min_year + 1;
-				$week = 1;
+				$minTime = array();
+				$minTime['year'] = $value['year'];
+				$minTime['week'] = $value['week'];
 			}
-			else
+			if( $maxTime == NULL || ($maxTime['year']*100 + $maxTime['week'] < $value['year']*100 + $value['week']))
 			{
-				$year = $min_year;
+				$maTime = array();
+				$maxTime['year'] = $value['year'];
+				$maxTime['week'] = $value['week'];
 			}
-			if( count($result['data']) != 0 )
+		}
+		$data = array();
+		for( $year = $maxTime['year'] ; $year >= $minTime['year'] ; $year -- )
+		{
+			$minWeek = 1;
+			$maxWeek = 52;
+			if( $year == $minTime['year'])
+				$minWeek = $minTime['week'];
+			if( $year == $maxTime['year'])
+				$maxWeek = $maxTime['week'];
+			for( $week = $maxWeek ; $week >= $minWeek ; $week -- )
 			{
-				for( $j = 0; $j < count($result['data']); $j ++ )
+				for( $type = 1 ; $type <=4 ; $type ++ )
 				{
-					switch($result['data'][$j]['type'])
+					$money = 0;
+					if( isset($statistic[$year][$week][$type]))
 					{
-						case '1':
-							$in_money = $result['data'][$j]['money'];
-							break;
-						case '2':
-							$out_money = $result['data'][$j]['money'];
-							break;
-						case '3':
-							$transfer_in_money = $result['data'][$j]['money'];
-							break;
-						case '4':
-							$transfer_out_money = $result['data'][$j]['money'];
-							break;
-						default:
-							break;
+						$money = $statistic[$year][$week][$type];
 					}
+					$typeMap = array(
+							1=>'收入',
+							2=>'支出',
+							3=>'转账收入',
+							4=>'转账支出'
+							);
+					$data[] = array(
+							'name'=>$year.'年'.sprintf('%02d', $week).'周',
+							'year'=>$year,
+							'week'=>$week,
+							'type'=>$type,
+							'typeName'=>$typeMap[$type],
+							'money'=>$money
+						       );
 				}
 			}
-			$data[0 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'1',
-						'typeName'=>'收入',
-						'money'=>$in_money
-						);
-			$data[1 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'2',
-						'typeName'=>'支出',
-						'money'=>$out_money
-						);
-			$data[2 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'3',
-						'typeName'=>'转账收入',
-						'money'=>$transfer_in_money
-						);
-			$data[3 + $i * 4] = array(
-						'name'=>$year.'年'.$week.'周',
-						'year'=>$year,
-						'week'=>$week,
-						'type'=>'4',
-						'typeName'=>'转账支出',
-						'money'=>$transfer_out_money
-						);
 		}
 		return array(
 				'code'=>0,
@@ -157,284 +115,202 @@ class Account_service extends CI_Model{
 	}
 	public function get_week_detail_type_statistic($where)
 	{
-		$year = $where['year'];
-		$week = $where['week'];
-		$first_week_day = date('w', strtotime($year.'-01-01 00:00:00'));
-		if($week == '1')
-		{
-			$down_time = $year.'-01-01 00:00:00';
-			$down_time_unix = strtotime($down_time);
-			$up_time = date('Y-m-d H:i:s', $down_time_unix + (7 - $first_week_day + 1) * 24 * 3600 );
-		}
-		$first_day = $year.'-01-01 00:00:00';
-		$first_time = strtotime($first_day);
-		$down_time = date('Y-m-d H:i:s', $first_time - ($first_week_day - 1 - ($week - 1) * 7) * 24 * 3600 );
-		$up_time = date('Y-m-d H:i:s', strtotime($down_time) + 7 * 24 * 3600 );
+		$result = $this->account_model->sel_by_category($where);
+		if( $result['code'] != 0 )
+			return $result;
+		$statistic = $result['data'];
 
-		$select = array(
-				'money'=>'money',
-				'name'=>'name',
-				'categoryId'=>'categoryId'
-			       );
-		$where_time = array(
-				'createTime >='=>$down_time,
-				'createTime <='=>$up_time,
-				'userId'=>$where['userId'],
-				'type'=>$where['type']
-				);
-		$group = array(
-				'categoryId'=>'categoryId'
-			      );
-		$result = $this->account_model->sel($select, $where_time, $group);
-		if( $result['data'] != FALSE )
+		$ids['userId'] = $where['userId'];
+		$result = $this->category_model->search($ids, array());
+		if( $result['code'] != 0 )
+			return $result;
+		$category = array();
+		foreach( $result['data']['data'] as $single)
 		{
-			foreach($result['data'] as $key=>$value)
-			{
-			$select = array(
-					'money'=>'money'	
-				       );
-			$group = array();
-			$temp = $this->account_model->sel($select, $where_time, $group);
-			if( $value['categoryId'] === '0')
-			{
-				$data = array(
-				);
-			}
-			else
-			{
-			$ids = array(
-						'categoryId'=>$value['categoryId']
-					    );
-			
-				$cate_names = $this->category_model->get_category_by_id($ids);
-				$precent = round($value['money']/$temp['data'][0]['money']*100, 2).'%';
-				$data[$key] = array(
-						'categoryId'=>$value['categoryId'],
-						'categoryName'=>$cate_names['data'][0]['name'],
-						'money'=>$value['money'],
-						'precent'=>$precent
-						);
-			}
-			}
+			$category[$single['categoryId']] = $single['name'];
 		}
-		else
+
+		$totalMoney = 0;
+		foreach( $statistic as $key=>$value)
 		{
-			$data = array();
+			$totalMoney += $value['money'];
+		}
+		foreach( $statistic as $key=>$value)
+		{
+			$value['precent'] = round($value['money']/$totalMoney*100, 2).'%';
+			if( array_key_exists($value['categoryId'], $category))
+				$value['categoryName'] = $category[$value['categoryId']];
+			else
+				$value['categoryName'] = '未分类';
+			$data[$key] = array(
+				'precent'=>$value['precent'],
+				'categoryName'=>$value['categoryName'],
+				'categoryId'=>$value['categoryId'],
+				'money'=>$value['money']
+			);
 		}
 		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>$data
-			    );
-	}
-	public function get_week_card_statistic($ids)
-	{
-		$min = $this->account_model->get_min_time($ids);
-		$max = $this->account_model->get_max_time($ids);
-		$min_time = $min['data'][0];
-		$max_time = $max['data'][0];
-		$cmin = strtotime($min_time['createTime']);
-		$cmax = strtotime($max_time['createTime']);
-		$min_week = date('W', $cmin);
-		$min_year = date('Y', $cmin);
-		$max_week = date('W', $cmax);
-		$max_year = date('Y', $cmax);
-		$min_week_day = date('w', $cmin);
-		$max_week_day = date('w', $cmax);
-
-		$down_time_day = date('Y-m-d', $cmin - $min_week_day * 3600 * 24);
-		$min_down_time = $down_time_day.' 00:00:00';
-		$up_time_day = date('Y-m-d', $cmin + (7 - $min_week_day) * 3600 * 24);
-		$min_up_time = $up_time_day.' 23:59:59';
-
-		$select = array(
-				'money'=>'money'
-			       );
-		$where['userId'] = $ids['userId'];
-		$group = array(
-			      );
+			    ); 
+	} 
+	public function get_week_card_statistic($ids) 
+	{ 
+		$result = $this->account_model->sel_by_card($ids);
+		if( $result['code'] != 0 )
+			return $result;
+		$accountInfo = $result['data'];
+		foreach( $accountInfo as $key=>$value )
+		{
+			$accountInfo[$key]['year'] = intval($value['year']);
+			$accountInfo[$key]['week'] = intval($value['week']);
+			$accountInfo[$key]['cardId'] = intval($value['cardId']);
+			$accountInfo[$key]['money'] = intval($value['money']);
+			$accountInfo[$key]['type'] = intval($value['type']);
+		}
 
 		$cards = $this->card_model->search($ids, array());
-		$count = $cards['data']['count'];
-		$card_data = $cards['data']['data'];
-		for($i = 0; ;$i++)
+		if( $cards['code'] != 0 )
+			return $cards;
+
+		$card = array();
+		foreach($cards['data']['data'] as $single)
 		{
-			$down_time = strtotime($min_down_time) + $i * 7 * 3600 * 24;
-			$up_time = strtotime($min_up_time) + $i * 7 * 3600 * 24;
-
-			if($up_time > ($cmax + 7 * 3600 * 24))
-				break;
-
-			$where['createTime >='] = date('Y-m-d H:i:s', $down_time);
-			$where['createTime <='] = date('Y-m-d H:i:s', $up_time);
-
-			foreach($card_data as $key=>$value)
+			$card[$single['cardId']] = $single;
+		}
+		foreach( $accountInfo as $key=>$value)
+		{
+			if( $value['cardId'] == 0 )
 			{
-				$where['cardId'] = $value['cardId'];
-				$result = $this->account_model->sel($select, $where, $group);
-				$week = $min_week + $i;
-					if($week > 53)
+				$card[0] = array(
+					'cardId'=>0,
+					'name'=>'无银行卡',
+					'money'=>0
+				);
+				break;
+			}
+		}
+
+		$statistic = array();
+		foreach( $accountInfo as $key=>$value)
+		{
+			$year = $value['year'];
+			$week = $value['week'];
+			$cardId = $value['cardId'];
+			$money = 0;
+			if( $value['type'] == 1 || $value['type'] == 3)
+				$money = $value['money'];
+			else
+				$money = -$value['money'];
+			if( ! isset($statistic[$year][$week][$cardId]))
+				$statistic[$year][$week][$cardId] = $money;
+			else
+				$statistic[$year][$week][$cardId] += $money;
+		}
+
+		$minTime = null;
+		$maxTime = null;
+		foreach( $accountInfo as $key=>$value )
+		{
+			if( $minTime == NULL || ($minTime['year']*100 + $minTime['week'] > $value['year']*100 + $value['week']))
+			{
+				$minTime = array();
+				$minTime['year'] = $value['year'];
+				$minTime['week'] = $value['week'];
+			}
+			if( $maxTime == NULL || ($maxTime['year']*100 + $maxTime['week'] < $value['year']*100 + $value['week']))
+			{
+				$maxTime = array();
+				$maxTime['year'] = $value['year'];
+				$maxTime['week'] = $value['week'];
+			}
+		}
+
+		$data = array();
+		$statistic2 = array();
+		for( $year = $minTime['year'] ; $year <= $maxTime['year'] ; $year ++ )
+		{
+			$minWeek = 1;
+			$maxWeek = 52;
+			if( $year == $minTime['year'] )
+				$minWeek = $minTime['week'];
+			if( $year == $maxTime['year'] )
+				$maxWeek = $maxTime['week'];
+			for ( $week = $minWeek ; $week <= $maxWeek ; $week ++ )
+			{
+				foreach( $card as $cardId=>$cardData )
+				{
+					$money = 0;
+					if( isset($statistic[$year][$week][$cardId] ))
+						$money = $statistic[$year][$week][$cardId];
+					if( $year == $minTime['year'] && $week == $minTime['week'] )
 					{
-						$year = $min_year + 1;
-						$week = 1;
+						$money = $cardData['money'] + intval($money);
 					}
 					else
 					{
-						$year = $min_year;
+						$lastYear = $year;
+						$lastWeek = $week - 1;
+						if( $lastWeek == 0 )
+						{
+							$lastYear = $lastYear - 1;
+							$lastWeek = 52;
+						}
+						$money = $statistic2[$lastYear][$lastWeek][$cardId] + $money;
 					}
-				if( $result['data'][0]['money'] != NULL )
-				{
-					$data[$key + $i * $count] = array(
-							'name'=>$year.'年'.$week.'周',
-							'year'=>$year,
-							'week'=>$week,
-							'cardId'=>$value['cardId'],
-							'cardName'=>$value['name'],
-							'money'=>$result['data'][0]['money']
-							);
-				}
-				else
-				{
-					$data[$key + $i * $count] = array(
-							'name'=>$year.'年'.$week.'周',
-							'year'=>$year,
-							'week'=>$week,
-							'cardId'=>$value['cardId'],
-							'cardName'=>$value['name'],
-							'money'=>0
-							);
-				}
-			}
-		}
-		if( $count != 0 )
-		{
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>$data
-			    );
-		}
-		else
-		{
-			return array(
-				'code'=>0,
-				'msg'=>'',
-				'data'=>array()
-			);
-		}
-	}
-	public function get_week_detail_card_statistic($where)
-	{
-		$year = $where['year'];
-		$week = $where['week'];
-		$first_week_day = date('w', strtotime($year.'-01-01 00:00:00'));
-		if( $week == '1')
-		{
-			$down_time = $year.'-01-01 00:00:00';
-			$down_time_unix = strtotime($down_time);
-			$up_time = date('Y-m-d H:i:s', $down_time_unix + (7 - $first_week_day + 1) * 24 * 3600 );
-		}
-		$first_day = $year.'-01-01 00:00:00';
-		$first_time = strtotime($first_day);
-		$down_time = date('Y-m-d H:i:s', $first_time - ($first_week_day - 1 - ($week - 1)*7) * 24 * 3600);
-		$up_time = date('Y-m-d H:i:s', strtotime($down_time) + 7 * 24 * 3600 );
-
-		$select = array(
-				'money'=>'money',
-				'type'=>'type'
-			       );
-		$where_time = array(
-				'createTime >='=>$down_time,
-				'createTime <='=>$up_time,
-				'userId'=>$where['userId'],
-				'cardId'=>$where['cardId']
-				);
-		$group = array(
-				'type'=>'type'
-			      );
-		$result = $this->account_model->sel($select, $where_time, $group);
-		if( $result['data'] != FALSE )
-		{
-			foreach($result['data'] as $key=>$value)
-			{
-			$select = array(
-					'money'=>'money'	
-				       );
-			$group = array();
-			$temp = $this->account_model->sel($select, $where_time, $group);
-			$precent = round($value['money']/$temp['data'][0]['money']*100, 2).'%';
-			switch($value['type'])
-			{
-				case '1':
-					$type_name = '收入';
-					break;
-				case '2':
-					$type_name = '支出';
-					break;
-				case '3':
-					$type_name = '转账收入';
-					break;
-				case '4':
-					$type_name = '转账支出';
-					break;
-				default:
-					break;
-			}
-			$data[$key] = array(
-					'type'=>$result['data'][0]['type'],
-					'typeName'=>$type_name,
-					'money'=>$value['money'],
-					'precent'=>$precent
+					$data[] = array(
+						'name'=>$year.'年'.sprintf('%02d', $week).'周',
+						'year'=>$year,
+						'week'=>$week,
+						'cardId'=>$cardId,
+						'cardName'=>$cardData['name'],
+						'money'=>$money
 					);
+					$statistic2[$year][$week][$cardId] = $money;
+				}
 			}
 		}
-		else
-		{
-			$data = array();
-		}
+		$data = array_reverse($data);
 		return array(
 				'code'=>0,
 				'msg'=>'',
 				'data'=>$data
 			    );
 	}
+	public function get_week_detail_card_statistic($where)
+	{
+		$result = $this->account_model->sel_by_type_with_card($where);
+		if( $result['code'] != 0 )
+			return $result;
+		$statistic = $result['data'];
+
+		$totalMoney = 0;
+		foreach( $statistic as $key=>$value )
+		{
+			$totalMoney += $value['money'];
+		}
+		foreach( $statistic as $key=>&$value )
+		{
+			$typeMap = array(
+				1=>'收入',
+				2=>'支出',
+				3=>'转账收入',
+				4=>'转账支出'
+			);
+			$value['typeName'] = $typeMap[$value['type']];
+			$value['precent'] = round($value['money']/$totalMoney*100, 2).'%';
+		}
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$statistic
+		);
+	}
 	public function del($where)
 	{
-		$accounts = $this->account_model->get_account_by_id($where);
 		$result = $this->account_model->del($where);
-		if( $result['code'] == 0 )
-		{
-			$userId = $where['userId'];
-			if( ($cardId = $accounts['data'][0]['cardId']) !== '0' )
-			{
-			$ids = array(
-				'cardId'=>$cardId,
-				'userId'=>$userId
-			);
-			$cards = $this->card_model->get_card_by_id($ids);
-			if( $accounts['data'][0]['type'] === '1' OR $accounts['data'][0]['type'] === '3' )
-			{
-				$card_money = $cards['data'][0]['money'] - $accounts['data'][0]['money'];
-			}
-			elseif( $accounts['data'][0]['type'] === '2' OR $accounts['data'][0]['type'] === '4' )
-			{
-				$card_money = $cards['data'][0]['money'] + $accounts['data'][0]['money'];
-			}
-			$card_moneys = array(
-				'money'=>$card_money
-			);
-			$this->card_model->mod($ids, $card_moneys);
-			}
-			return $result;
-		}
-		else
-		{
-			return array(
-				'code'=>1,
-				'msg'=>'delete failed',
-				'data'=>''
-			);
-		}
+		return $result;
 	}
 	public function add($data)
 	{
@@ -451,23 +327,6 @@ class Account_service extends CI_Model{
 					'data'=>''
 				    );
 
-		$ids = array(
-				'userId'=>$data['userId'],
-				'cardId'=>$data['cardId']
-			    );
-		$cards = $this->card_model->get_card_by_id($ids);
-		if( $data['type'] === '1' OR $data['type'] === '3' )
-		{
-			$card_money = $cards['data'][0]['money'] + $data['money'];
-		}
-		elseif( $data['type'] === '2' OR $data['type'] === '4' )
-		{
-			$card_money = $cards['data'][0]['money'] - $data['money'];
-		}
-		$card_moneys = array(
-				'money'=>$card_money
-				);
-		$this->card_model->mod($ids, $card_moneys);
 		$result = $this->account_model->add($data);
 		return $result;
 	}
@@ -481,35 +340,6 @@ class Account_service extends CI_Model{
 		$accounts = $result['data'];
 		if( $accounts[0]['name'] == $data['name'] )
 		{
-			if( isset($data['money']) && isset($data['cardId']) )
-			{
-				$ids = array(
-						'userId'=>$where['userId'],
-						'cardId'=>$data['cardId']
-					    );
-				$cards = $this->card_model->get_card_by_id($ids);
-				if( $accounts[0]['type'] === '1' OR $accounts[0]['type'] === '3' )
-				{
-					$origin_money = $cards['data'][0]['money'] - $accounts[0]['money'];
-				}
-				elseif( $accounts[0]['type'] === '2' OR $accounts[0]['type'] === '4' )
-				{
-					$origin_money = $cards['data'][0]['money'] + $accounts[0]['money'];
-				}
-
-				if( $data['type'] === '1' OR $data['type'] === '3' )
-				{
-					$card_money = $origin_money  + $data['money'];
-				}
-				elseif( $data['type'] === '2' OR $data['type'] === '4' )
-				{
-					$card_money = $origin_money - $data['money'];
-				}
-				$card_moneys = array(
-						'money'=>$card_money
-						);
-				$this->card_model->mod($ids, $card_moneys);
-			}
 			$result = $this->account_model->mod($where, $data);
 			return $result;
 		}
@@ -526,35 +356,6 @@ class Account_service extends CI_Model{
 					'data'=>''
 				    );
 
-		if( isset($data['money']) && isset($data['cardId']) )
-		{
-			$ids = array(
-					'userId'=>$where['userId'],
-					'cardId'=>$data['cardId']
-				    );
-			$cards = $this->card_model->get_card_by_id($ids);
-			if( $accounts[0]['type'] === '1' OR $accounts[0]['type'] === '3' )
-			{
-				$origin_money = $cards['data'][0]['money'] - $accounts[0]['money'];
-			}
-			elseif( $accounts[0]['type'] === '2' OR $accounts[0]['type'] === '4' )
-			{
-				$origin_money = $cards['data'][0]['money'] + $accounts[0]['money'];
-			}
-
-			if( $data['type'] === '1' OR $data['type'] === '3' )
-			{
-				$card_money = $origin_money + $data['money'];
-			}
-			elseif( $data['type'] === '2' OR $data['type'] === '4' )
-			{
-				$card_money = $origin_money - $data['money'];
-			}
-			$card_moneys = array(
-					'money'=>$card_money
-					);
-			$this->card_model->mod($ids, $card_moneys);
-		}
 		$result = $this->account_model->mod($where, $data);
 		return $result;
 	}

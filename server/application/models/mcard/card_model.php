@@ -77,6 +77,7 @@ class Card_model extends CI_Model{
 			if( $size != FALSE )
 				$this->db->limit($size, $offset);
 		}
+		$this->db->order_by('modifyTime', 'DESC');
 		$query = $this->db->get('t_card');
 		$data = $query->result_array();
 		$result = array(

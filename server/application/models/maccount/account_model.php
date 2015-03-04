@@ -52,6 +52,7 @@ class Account_model extends CI_Model{
 
 		if(isset($limit['pageSize']) && isset($limit['pageIndex']) && $limit['pageSize'] != FALSE )
 			$this->db->limit($limit['pageSize'], $limit['pageIndex']);
+		$this->db->order_by('modifyTime', 'DESC');
 		$query = $this->db->get('t_account');
 		$data = $query->result_array();
 		$result = array(
@@ -116,15 +117,15 @@ class Account_model extends CI_Model{
 	{
 		foreach($select as $key=>$value)
 		{
-			if($key == 'money')
+			if($key === 'money')
 			{
 				$this->db->select_sum($value);
 			}
 			else
 			{
-				$this->db->select($value);
-			}
-		}
+				$this->db->select($value); 
+			} 
+		} 
 		foreach($where as $key=>$value)
 		{
 			$this->db->where($key, $value);
@@ -133,7 +134,54 @@ class Account_model extends CI_Model{
 		{
 			$this->db->group_by($value);
 		}
-		$query = $this->db->get('t_account');
+		$this->db->from("t_account");
+		$query = $this->db->get();
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function sel_by_type($ids)
+	{
+		$sql = "select type, date_format(createTime, '%x') as year, date_format(createTime, '%v') as week, sum(money) as money from t_account where userId=? group by type, year, week";
+		$query = $this->db->query($sql, $ids);
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function sel_by_category($where)
+	{
+		$sql = "select categoryId, sum(money) as money from t_account where DATE_FORMAT(createTime, '%x') = ? and TRIM(LEADING '0' From DATE_FORMAT(createTime, '%v')) = ? and userId = ? and type = ? group by categoryId";
+		$argv = array($where['year'], $where['week'], $where['userId'], $where['type']);
+		$query = $this->db->query($sql, $argv);
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function sel_by_card($ids)
+	{
+		$sql = "select DATE_FORMAT(createTime, '%x') as year, TRIM( LEADING '0' From DATE_FORMAT(createTime, '%v')) as week, cardId, type, SUM(Money) as money from t_account where userId = ? group by year, week, cardId, type order by year asc, week asc";
+		$query = $this->db->query($sql, $ids);
+		$data = $query->result_array();
+		return array(
+			'code'=>0,
+			'msg'=>'',
+			'data'=>$data
+		);
+	}
+	public function sel_by_type_with_card($where)
+	{
+		$sql = "select type, sum(money) as money from t_account where DATE_FORMAT(createTime, '%x') = ? and TRIM( LEADING '0' From DATE_FORMAT(createTime, '%v')) = ? and userId = ? and cardId = ? group by type";
+		$argv = array($where['year'], $where['week'], $where['userId'], $where['cardId']);
+		$query = $this->db->query($sql, $argv);
 		$data = $query->result_array();
 		return array(
 			'code'=>0,

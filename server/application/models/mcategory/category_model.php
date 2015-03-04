@@ -74,6 +74,7 @@
 				if( $limit['pageSize'] != FALSE )
 					$this->db->limit($limit['pageSize'], $limit['pageIndex']);
 			}
+			$this->db->order_by('modifyTime', 'DESC');
 			$query = $this->db->get('t_category');
 			$data = $query->result_array();
 			$result = array(
